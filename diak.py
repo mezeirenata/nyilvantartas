@@ -10,7 +10,7 @@ class Diak:
 
     def jegyekDict(self):
         dictionary = {}
-        f = open("jegyek.csv", "r", encoding="utf-8")
+        f = open("csv/jegyek.csv", "r", encoding="utf-8")
         for i, sor in enumerate(f):
             splitted = sor.strip().split(";")
             if i == 0:
