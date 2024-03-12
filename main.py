@@ -1,3 +1,5 @@
+from os import system as cmd
+cmd("pip install textual")
 from textual import on
 from textual.app import App, ComposeResult
 from textual.validation import Function
