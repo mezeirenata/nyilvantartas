@@ -4,6 +4,7 @@ class Diak:
         self.nev = data[0]
         self.osztaly = data[1]
         self.email = data[2]
+        
         self.jelszo = data[3]
         self.osztondij = int(data[4])
         self.jegyek = self.jegyekDict()

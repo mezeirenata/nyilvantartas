@@ -3,7 +3,7 @@ from diak import Diak
 class Jegyek:
     def __init__(self, sor) -> None:
         data = sor.strip().split(";")
-        self.nev = nevDiak('diakok.csv')
+        self.nev,self.osztaly,self.email,self.jelszo,self.osztondij = self.nevDiak('diakok.csv', data[0])
         #elsődleges kulcs
         self.jegyek = self.jegyekDict()
 
@@ -27,14 +27,22 @@ class Jegyek:
 
         f.close()
         return dictionary
-    def nevDiak(filename:str):
-        f = open(filename, 'r', encoding= 'utf-8')
-        elsodleges_kulcs = 'None'
-        for sor in f:
-            
         
+    def nevDiak(self, filename:str, nev:str) -> tuple:
+        f = open(f"csv/{filename}", 'r', encoding= 'utf-8')
+        elsodleges_kulcs = 'None'
+        f.readline()
+        for sor in f:
+            splitted = sor.split(';')
+            if nev == str(splitted[0]):
+                self.nev = str(splitted[0])
+                self.osztaly = splitted[1]
+                self.email = splitted[2]
+                self.jelszo = splitted[3]
+                self.osztondij = int(splitted[4])
+                return self.nev,self.osztaly,self.email,self.jelszo,self.osztondij
+            
         f.close()
-
 
 
 # nev;tortenelem;informatika;angol;irodalom;nyelvtan;testneveles;matek;fizika
