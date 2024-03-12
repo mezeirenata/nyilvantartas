@@ -4,10 +4,10 @@ class Diak:
         self.nev = data[0]
         self.osztaly = data[1]
         self.email = data[2]
-        
         self.jelszo = data[3]
         self.osztondij = int(data[4])
         self.jegyek = self.jegyekDict()
+        self.tan_atlag = self.tanAtlag()
 
     def jegyekDict(self):
         dictionary = {}
@@ -17,7 +17,7 @@ class Diak:
             if i == 0:
                 targyak = sor.strip().split(";")
                 for t in targyak:
-                    if t != "nev":
+                    if t != "Név":
                         dictionary[t] = []
             else:
                 if splitted[0] == self.nev:
@@ -30,4 +30,32 @@ class Diak:
         f.close()
         return dictionary
 
+    def tanAtlag(self):
+        tan_atlag = 0
+        atlag_lista = []
+        for lista in self.jegyek.values():
+            print(lista)
+            atlag = 0
+            for x in lista:
+                atlag += x
+            atlag = atlag / len(lista)
+            atlag_lista.append(atlag)
+        for i in atlag_lista:
+            tan_atlag += i
+        tan_atlag = tan_atlag / len(atlag_lista)
 
+        return tan_atlag
+
+
+diakok: list[Diak] = []
+
+
+def readFile():
+    f = open("csv/diakok.csv", "r", encoding="utf-8")
+    f.readline()
+    for sor in f:
+        diakok.append(Diak(sor))
+    f.close()
+
+
+readFile()
