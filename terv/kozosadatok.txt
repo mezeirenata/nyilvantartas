@@ -1,0 +1,3 @@
+diak    (diak)nev;osztaly;email;jelszo;osztondij
+jegyek  (diak)nev;tortenelem;informatika;angol;irodalom;nyelvtan;testneveles;matek;fizika
+tanar (tanar)nev;osztalyok;email;jelszo;tantargyak

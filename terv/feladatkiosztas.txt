@@ -1,0 +1,23 @@
+diakok.csv - Marci
+jegyek.csv - Marci
+tanarok.csv
+
+tanar.py - Reni
+jegyek.py - Reni
+
+fuggvenyek.py
+bejelentkezes - Noel
+main - Noel
+
+
+---
+
+drawio - Reni
+README.md - Noel
+
+---
+
+HTML:
+index - Noel
+bemutatkozas.HTML
+inspiracio.HTML
