@@ -1,11 +1,22 @@
 from textual import on
 from textual.app import App, ComposeResult
 from textual.validation import Function
-from textual.widgets import Input, Label, Pretty, Button
-from main import diakok
+from textual.widgets import Input, Label, Pretty, Button, Header
+from diak import *
+
+diakok: list[Diak] = []
+
+def readFile(filename):
+    f = open(f"csv/{filename}", "r",encoding="utf-8")
+    f.readline()
+    for sor in f:
+        diakok.append(Diak(sor))
+    f.close()
+
+readFile("diakok.csv")
 
 
-class InputApp(App):
+class KretaApp(App):
     
     CSS = """
     Input.-valid {
@@ -17,46 +28,89 @@ class InputApp(App):
     Input {
         margin: 1 1;
     }
-    Label {
-        margin: 1 2;
-        color: blue;
-    }
-    Pretty {
-        margin: 1 2;
-    }
-    #login {
+    #loginBtn {
         margin-left: 2;
+    }
+    #loginBtn:focus{
+        text-style: none;
+    }
+    Header {
+        color: red;
+    }
+    #loginLabel {
+        margin: 2 3;
+        color: auto;
+        background: white 25%;
+    }
+    #jegyekLabel {
+        margin: 2 3;
+    }
+    #jegyek {
+        margin: 4 0;
     }
     """
 
     def compose(self) -> ComposeResult:
-        yield Label("Kréta 2.0")
+        yield Header()
         yield Input(
             placeholder="Email",
             validators=[Function(bad_e)],
-            id="email"
+            id="email",
+            value=""
         )
         yield Input(
             placeholder="Jelszó",
             validators=[Function(bad_j)],
             password=True,
-            id="jelszo"
+            id="password",
+            value=""
         )
         yield Button(
             label="Bejelentkezés",
-            id="login"
+            id="loginBtn"
         )
-        yield Label(id="a")
 
-
-    @on(Input.Submitted)
-    def login(self, event: Input.Submitted) -> None:
-        for d in diakok:
-            if d.email == event.value:
-                self.query_one("#a").update(d.nev)
+        yield Label("", id="loginLabel")
+        yield Label("", id="jegyekLabel")
+        yield Pretty(None, id="jegyek")
     
-                
+    def on_mount(self):
+        self.title = "Kréta 2.0"
+        
 
+    global email
+    global password
+    email = ""
+    password = ""
+
+    @on(Input.Changed, "#email")
+    def changeEmail(self, event: Input.Changed):
+        global email
+        email = event.value
+
+    @on(Input.Changed, "#password")
+    def changePassword(self, event: Input.Changed):
+        global password
+        password = event.value
+
+
+    @on(Button.Pressed)
+    def login(self, event: Button.Pressed) -> None:
+        
+
+        for d in diakok:
+            if d.email == email and d.jelszo == password:
+                self.query_one("#loginLabel").update(f"Bejelentkezve: {d.nev}")
+                self.query_one("#jegyekLabel").update("Jegyek")
+
+                self.query_one("#jegyek").update(d.jegyek)
+            else:
+                self.query_one("#jegyek").update(None)
+
+
+
+
+    
     
         
 
@@ -77,7 +131,6 @@ def bad_j(value: str) -> bool:
     except ValueError:
         return False
 
-app = InputApp()
 
 if __name__ == "__main__":
-    app.run()
+    KretaApp().run()
