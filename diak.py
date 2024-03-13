@@ -8,6 +8,7 @@ class Diak:
         self.osztondij = int(data[4])
         self.jegyek = self.jegyekDict()
         self.tan_atlag = self.tanAtlag()
+        self.orarend = self.orarendParser()
 
     def jegyekDict(self):
         dictionary = {}
@@ -34,7 +35,6 @@ class Diak:
         tan_atlag = 0
         atlag_lista = []
         for lista in self.jegyek.values():
-            print(lista)
             atlag = 0
             for x in lista:
                 atlag += x
@@ -45,6 +45,48 @@ class Diak:
         tan_atlag = tan_atlag / len(atlag_lista)
 
         return tan_atlag
+
+    def orarendParser(self):
+        ROWS = [
+            [f"{self.osztaly}", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"],
+            [1, "", "", "", "", ""],
+            [2, "", "", "", "", ""],
+            [3, "", "", "", "", ""],
+            [4, "", "", "", "", ""],
+            [5, "", "", "", "", ""],
+            [6, "", "", "", "", ""],
+            [7, "", "", "", "", ""],
+        ]
+
+        f = open("csv/orarendek.csv", "r", encoding="utf-8")
+        f.readline()
+        for sor in f:
+            splitted = sor.strip().split(";")
+            if splitted[0] == self.osztaly:
+                match splitted[1]:
+                    case "hetfo":
+                        for i, s in enumerate(splitted[2:]):
+                            ROWS[i + 1][1] = s
+
+                    case "kedd":
+                        for i, s in enumerate(splitted[2:]):
+                            ROWS[i + 1][2] = s
+
+                    case "szerda":
+                        for i, s in enumerate(splitted[2:]):
+                            ROWS[i + 1][3] = s
+
+                    case "csutortok":
+                        for i, s in enumerate(splitted[2:]):
+                            ROWS[i + 1][4] = s
+
+                    case "pentek":
+                        for i, s in enumerate(splitted[2:]):
+                            ROWS[i + 1][5] = s
+
+        f.close()
+
+        return ROWS
 
 
 diakok: list[Diak] = []

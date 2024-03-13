@@ -1,14 +1,22 @@
 from os import system as cmd
+
 cmd("pip install textual")
 from textual import on
 from textual.app import App, ComposeResult
 from textual.validation import Function
-from textual.widgets import Input, Label, Pretty, Button, Header, Select, Static
+from textual.widgets import (
+    Input,
+    Label,
+    Button,
+    Header,
+    Select,
+    DataTable,
+)
 from textual.containers import Container
 from diak import *
 
 
-LINES = list(diakok[0].jegyek)
+JEGYEK = list(diakok[0].jegyek)
 
 
 class KretaApp(App):
@@ -82,25 +90,35 @@ class KretaApp(App):
                 Button(label="Reset", id="resetBtn", classes="btn"),
                 classes="centerCont",
             ),
-            id="screen1",
+            id="loginScreen",
         )
 
         yield Container(
             Button("Kijelentkezés", id="logoutBtn", classes="btn"),
             Label("", id="loginLabel"),
+            Button("Órarend", id="orarendBtn", classes="btn"),
+            Button("Jegyek", id="jegyekBtn", classes="btn"),
+            id="mainScreen",
+        )
+
+        yield Container(DataTable(id="orarend"), id="orarendScreen")
+
+        yield Container(
             Label("", id="jegyekLabel"),
             Select(
-                ((line, line) for line in LINES),
+                ((line, line) for line in JEGYEK),
                 id="jegyekSelect",
                 allow_blank=False,
                 value="Történelem",
             ),
             Label("", id="jegyek"),
-            id="screen2",
+            id="jegyekScreen",
         )
 
     def on_mount(self):
-        self.query_one("#screen2").display = False
+        self.query_one("#mainScreen").display = False
+        self.query_one("#orarendScreen").display = False
+        self.query_one("#jegyekScreen").display = False
         self.title = "Kréta 2.0"
 
     global email
@@ -140,8 +158,8 @@ class KretaApp(App):
         for d in diakok:
             if d.email == email and d.jelszo == password:
 
-                self.query_one("#screen1").display = False
-                self.query_one("#screen2").display = True
+                self.query_one("#loginScreen").display = False
+                self.query_one("#mainScreen").display = True
 
                 self.query_one("#loginLabel").update(f"Bejelentkezve: {d.nev}")
                 self.query_one("#jegyekLabel").update(
@@ -156,8 +174,27 @@ class KretaApp(App):
 
     @on(Button.Pressed, "#logoutBtn")
     def logout(self, event: Button.Pressed) -> None:
-        self.query_one("#screen1").display = True
-        self.query_one("#screen2").display = False
+        self.query_one("#loginScreen").display = True
+        self.query_one("#mainScreen").display = False
+        self.query_one("#orarendScreen").display = False
+        self.query_one("#jegyekScreen").display = False
+
+    @on(Button.Pressed, "#orarendBtn")
+    def orarend(self, event: Button.Pressed) -> None:
+        self.query_one("#orarendScreen").display = True
+        self.query_one("#jegyekScreen").display = False
+        for d in diakok:
+            if d.email == email:
+                table: DataTable = self.query_one("#orarend")
+                table.clear(True)
+
+                table.add_columns(*d.orarend[0])
+                table.add_rows(d.orarend[1:])
+
+    @on(Button.Pressed, "#jegyekBtn")
+    def jegyek(self, event: Button.Pressed) -> None:
+        self.query_one("#orarendScreen").display = False
+        self.query_one("#jegyekScreen").display = True
 
 
 def bad_e(value: str) -> bool:
