@@ -4,25 +4,14 @@ cmd("pip install textual")
 from textual import on
 from textual.app import App, ComposeResult
 from textual.validation import Function
-from textual.widgets import (
-    Input,
-    Label,
-    Button,
-    Header,
-    Select,
-    DataTable,
-)
+from textual.widgets import Input, Label, Button, Header, Select, DataTable, Pretty
 from textual.containers import Container
 from diak import *
-from t1 import *
-
-
+from tanar import *
 
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
-
-
 
 
 # app
@@ -72,16 +61,11 @@ class KretaApp(App):
     }
     """
 
-
-
     # globális email, jelszó változó
     global email
     global password
     email = ""
     password = ""
-
-
-
 
     # init widgets
     def compose(self) -> ComposeResult:
@@ -117,17 +101,16 @@ class KretaApp(App):
             Label("", classes="loginLabel", id="diakLoginLabel"),
             Button("Órarend", id="orarendBtn", classes="btn"),
             Button("Jegyek", id="jegyekBtn", classes="btn"),
+            Pretty("", id="osztondij"),
             id="diakScreen",
         )
 
         yield Container(
             Button("Kijelentkezés", id="logoutBtn", classes="btn"),
             Label("", classes="loginLabel", id="tanarLoginLabel"),
+            Pretty("", id="targyak"),
             id="tanarScreen",
         )
-
-
-
 
         yield Container(DataTable(id="orarend"), id="orarendView")
 
@@ -143,21 +126,12 @@ class KretaApp(App):
             id="jegyekView",
         )
 
-
-
-
-
-
     def on_mount(self):
         self.query_one("#diakScreen").display = False
         self.query_one("#tanarScreen").display = False
         self.query_one("#orarendView").display = False
         self.query_one("#jegyekView").display = False
         self.title = "Kréta 2.0"
-
-
-
-
 
     # handle email, password change
     @on(Input.Changed, "#email")
@@ -169,13 +143,6 @@ class KretaApp(App):
     def changePassword(self, event: Input.Changed):
         global password
         password = event.value
-
-
-
-
-
-
-
 
     @on(Select.Changed, "#jegyekSelect")
     def select_changed(self, event: Select.Changed) -> None:
@@ -194,12 +161,6 @@ class KretaApp(App):
                 self.query_one("#jegyek").display = True
                 self.query_one("#jegyek").update(f"{string}\n\nÁtlag: {atlag:.2f}")
 
-
-
-
-
-
-
     # handle button presses
     @on(Button.Pressed, "#loginBtn")
     def login(self, event: Button.Pressed) -> None:
@@ -210,12 +171,14 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#diakScreen").display = True
 
-                self.query_one("#diakLoginLabel").update(f"Bejelentkezve: {d.nev} (diák)")
+                self.query_one("#diakLoginLabel").update(
+                    f"Bejelentkezve: {d.nev} (diák)"
+                )
                 self.query_one("#jegyekLabel").update(
                     f"Jegyek\nTanulmányi átlag: {d.tan_atlag:.2f}"
                 )
                 self.query_one("#jegyek").display = False
-
+                self.query_one("#osztondij").update(f"Ösztöndíj: {d.osztondij}")
 
         # tanár bejelentkezés
         for t in tanarok:
@@ -223,9 +186,10 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                self.query_one("#tanarLoginLabel").update(f"Bejelentkezve: {t.nev} (tanár)")
-
-
+                self.query_one("#tanarLoginLabel").update(
+                    f"Bejelentkezve: {t.nev} (tanár)"
+                )
+                self.query_one("#targyak").update(f"Tantárgyak: {t.targyak}")
 
     @on(Button.Pressed, "#resetBtn")
     def reset(self, event: Button.Pressed) -> None:
@@ -257,9 +221,6 @@ class KretaApp(App):
         self.query_one("#jegyekView").display = True
 
 
-
-
-
 # validate email, password
 def bad_e(value: str) -> bool:
     try:
@@ -283,7 +244,6 @@ def bad_p(value: str) -> bool:
                 return True
     except ValueError:
         return False
-
 
 
 # run app

@@ -5,10 +5,10 @@ class Diak:
         self.osztaly = data[1]
         self.email = data[2]
         self.jelszo = data[3]
-        self.osztondij = int(data[4])
         self.jegyek = self.jegyekDict()
         self.tan_atlag = self.tanAtlag()
         self.orarend = self.orarendParser()
+        self.osztondij = self.osztondij()
 
     def jegyekDict(self):
         dictionary = {}
@@ -62,31 +62,51 @@ class Diak:
         f.readline()
         for sor in f:
             splitted = sor.strip().split(";")
+            targyak = splitted[2].split(",")
             if splitted[0] == self.osztaly:
                 match splitted[1]:
-                    case "hetfo":
-                        for i, s in enumerate(splitted[2:]):
+                    case "Hétfő":
+                        for i, s in enumerate(targyak):
                             ROWS[i + 1][1] = s
 
-                    case "kedd":
-                        for i, s in enumerate(splitted[2:]):
+                    case "Kedd":
+                        for i, s in enumerate(targyak):
                             ROWS[i + 1][2] = s
 
-                    case "szerda":
-                        for i, s in enumerate(splitted[2:]):
+                    case "Szerda":
+                        for i, s in enumerate(targyak):
                             ROWS[i + 1][3] = s
 
-                    case "csutortok":
-                        for i, s in enumerate(splitted[2:]):
+                    case "Csütörtök":
+                        for i, s in enumerate(targyak):
                             ROWS[i + 1][4] = s
 
-                    case "pentek":
-                        for i, s in enumerate(splitted[2:]):
+                    case "Péntek":
+                        for i, s in enumerate(targyak):
                             ROWS[i + 1][5] = s
 
         f.close()
 
         return ROWS
+
+    def osztondij(self):
+        dij = 0
+        if ("9" in self.osztaly) or ("10" in self.osztaly):
+            dij = 8000
+        else:
+            a = self.tan_atlag
+            if a > 4.49:
+                dij = 59000
+            elif a > 4:
+                dij = 42000
+            elif a > 3:
+                dij = 25000
+            elif a > 2:
+                dij = 8000
+            else:
+                dij = "Nincs"
+
+        return dij
 
 
 diakok: list[Diak] = []
