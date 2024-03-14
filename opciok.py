@@ -53,4 +53,27 @@ def Tantargyi_atlag(value_a:list[int]) -> float:
         sum += x
     return sum/len(value_a)
 
+def Tanarok_bukoosztalyai(tanar:str) -> dict:
+    bukoosztalyok = {}
+    for t in tanarok:
+        if t.nev == tanar:
+            if t.osztaly not in bukoosztalyok.keys():
+                bukoosztalyok[t.osztaly] = None
+            else:
+                pass
+    for d in diakok:
+        if d.osztaly in bukoosztalyok.keys():
+            if bukasra_vagynem(d.nev):
+                if bukoosztalyok[d.osztaly] == None:
+                    bukoosztalyok[d.osztaly] = d.nev
+                else:
+                    bukoosztalyok[d.osztaly] += d.nev + ", "
+    return bukoosztalyok
 
+def bukasra_vagynem(diak_neve: str) -> bool:
+    for d in diakok:
+        for key,value in d.jegyek.items():
+            value = Tantargyi_atlag(value)
+            if int(round(value)) < 2 :
+                return True
+    return False
