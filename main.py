@@ -14,11 +14,18 @@ from textual.widgets import (
 )
 from textual.containers import Container
 from diak import *
+from t1 import *
 
 
-JEGYEK = list(diakok[0].jegyek)
 
 
+# tantárgyak listája
+TARGYAK = list(diakok[0].jegyek)
+
+
+
+
+# app
 class KretaApp(App):
 
     CSS = """
@@ -38,7 +45,7 @@ class KretaApp(App):
     .btn {
         text-style: none;
     }
-    #loginLabel {
+    .loginLabel {
         margin: 2 3;
         color: auto;
         background: white 25%;
@@ -65,6 +72,18 @@ class KretaApp(App):
     }
     """
 
+
+
+    # globális email, jelszó változó
+    global email
+    global password
+    email = ""
+    password = ""
+
+
+
+
+    # init widgets
     def compose(self) -> ComposeResult:
         yield Header()
         yield Container(
@@ -95,37 +114,52 @@ class KretaApp(App):
 
         yield Container(
             Button("Kijelentkezés", id="logoutBtn", classes="btn"),
-            Label("", id="loginLabel"),
+            Label("", classes="loginLabel", id="diakLoginLabel"),
             Button("Órarend", id="orarendBtn", classes="btn"),
             Button("Jegyek", id="jegyekBtn", classes="btn"),
-            id="mainScreen",
+            id="diakScreen",
         )
 
-        yield Container(DataTable(id="orarend"), id="orarendScreen")
+        yield Container(
+            Button("Kijelentkezés", id="logoutBtn", classes="btn"),
+            Label("", classes="loginLabel", id="tanarLoginLabel"),
+            id="tanarScreen",
+        )
+
+
+
+
+        yield Container(DataTable(id="orarend"), id="orarendView")
 
         yield Container(
             Label("", id="jegyekLabel"),
             Select(
-                ((line, line) for line in JEGYEK),
+                ((line, line) for line in TARGYAK),
                 id="jegyekSelect",
                 allow_blank=False,
                 value="Történelem",
             ),
             Label("", id="jegyek"),
-            id="jegyekScreen",
+            id="jegyekView",
         )
 
+
+
+
+
+
     def on_mount(self):
-        self.query_one("#mainScreen").display = False
-        self.query_one("#orarendScreen").display = False
-        self.query_one("#jegyekScreen").display = False
+        self.query_one("#diakScreen").display = False
+        self.query_one("#tanarScreen").display = False
+        self.query_one("#orarendView").display = False
+        self.query_one("#jegyekView").display = False
         self.title = "Kréta 2.0"
 
-    global email
-    global password
-    email = ""
-    password = ""
 
+
+
+
+    # handle email, password change
     @on(Input.Changed, "#email")
     def changeEmail(self, event: Input.Changed):
         global email
@@ -135,6 +169,13 @@ class KretaApp(App):
     def changePassword(self, event: Input.Changed):
         global password
         password = event.value
+
+
+
+
+
+
+
 
     @on(Select.Changed, "#jegyekSelect")
     def select_changed(self, event: Select.Changed) -> None:
@@ -153,19 +194,38 @@ class KretaApp(App):
                 self.query_one("#jegyek").display = True
                 self.query_one("#jegyek").update(f"{string}\n\nÁtlag: {atlag:.2f}")
 
+
+
+
+
+
+
+    # handle button presses
     @on(Button.Pressed, "#loginBtn")
     def login(self, event: Button.Pressed) -> None:
+        # diák bejelentkezés
         for d in diakok:
             if d.email == email and d.jelszo == password:
 
                 self.query_one("#loginScreen").display = False
-                self.query_one("#mainScreen").display = True
+                self.query_one("#diakScreen").display = True
 
-                self.query_one("#loginLabel").update(f"Bejelentkezve: {d.nev}")
+                self.query_one("#diakLoginLabel").update(f"Bejelentkezve: {d.nev} (diák)")
                 self.query_one("#jegyekLabel").update(
                     f"Jegyek\nTanulmányi átlag: {d.tan_atlag:.2f}"
                 )
                 self.query_one("#jegyek").display = False
+
+
+        # tanár bejelentkezés
+        for t in tanarok:
+            if t.email == email and t.jelszo == password:
+                self.query_one("#loginScreen").display = False
+                self.query_one("#tanarScreen").display = True
+
+                self.query_one("#tanarLoginLabel").update(f"Bejelentkezve: {t.nev} (tanár)")
+
+
 
     @on(Button.Pressed, "#resetBtn")
     def reset(self, event: Button.Pressed) -> None:
@@ -175,32 +235,39 @@ class KretaApp(App):
     @on(Button.Pressed, "#logoutBtn")
     def logout(self, event: Button.Pressed) -> None:
         self.query_one("#loginScreen").display = True
-        self.query_one("#mainScreen").display = False
-        self.query_one("#orarendScreen").display = False
-        self.query_one("#jegyekScreen").display = False
+        self.query_one("#diakScreen").display = False
+        self.query_one("#tanarScreen").display = False
+        self.query_one("#orarendView").display = False
+        self.query_one("#jegyekView").display = False
 
     @on(Button.Pressed, "#orarendBtn")
     def orarend(self, event: Button.Pressed) -> None:
-        self.query_one("#orarendScreen").display = True
-        self.query_one("#jegyekScreen").display = False
+        self.query_one("#orarendView").display = True
+        self.query_one("#jegyekView").display = False
         for d in diakok:
             if d.email == email:
                 table: DataTable = self.query_one("#orarend")
                 table.clear(True)
-
                 table.add_columns(*d.orarend[0])
                 table.add_rows(d.orarend[1:])
 
     @on(Button.Pressed, "#jegyekBtn")
     def jegyek(self, event: Button.Pressed) -> None:
-        self.query_one("#orarendScreen").display = False
-        self.query_one("#jegyekScreen").display = True
+        self.query_one("#orarendView").display = False
+        self.query_one("#jegyekView").display = True
 
 
+
+
+
+# validate email, password
 def bad_e(value: str) -> bool:
     try:
         for d in diakok:
             if d.email == value:
+                return True
+        for t in tanarok:
+            if t.email == value:
                 return True
     except ValueError:
         return False
@@ -211,9 +278,14 @@ def bad_p(value: str) -> bool:
         for d in diakok:
             if d.jelszo == value and d.email == email:
                 return True
+        for t in tanarok:
+            if t.jelszo == value and t.email == email:
+                return True
     except ValueError:
         return False
 
 
+
+# run app
 if __name__ == "__main__":
     KretaApp().run()
