@@ -8,6 +8,7 @@ from textual.widgets import Input, Label, Button, Header, Select, DataTable, Pre
 from textual.containers import Container
 from diak import *
 from tanar import *
+from opciok import *
 
 
 # tantárgyak listája
@@ -189,7 +190,9 @@ class KretaApp(App):
                 self.query_one("#tanarLoginLabel").update(
                     f"Bejelentkezve: {t.nev} (tanár)"
                 )
-                self.query_one("#targyak").update(f"Tantárgyak: {t.targyak}")
+                self.query_one("#targyak").update(
+                    f"Bukásra álló diákok: {Tanarok_bukoosztalyai(t.nev)}"
+                )
 
     @on(Button.Pressed, "#resetBtn")
     def reset(self, event: Button.Pressed) -> None:
