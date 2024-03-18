@@ -114,7 +114,20 @@ def DiákVagyNem(felhasznalo:str) -> bool|None:
         if t.nev == felhasznalo:
             return False
     return None
-    
 
+def Eletkor(szuletesi_datum:str, mai_datum:str) -> int:
+    #2000.01.01
+    eletkor = 0
+    ev,honap,nap = szuletesi_datum.split('.')
+    ev2,honap2,nap2 = mai_datum.split('.')
+    ev = int(ev) 
+    ev2 = int(ev2)
+    eltelt_evek = ev2 - ev
+
+    if honap2 == honap and nap == nap2:
+        eletkor = eltelt_evek
+    else:
+        eletkor  = eltelt_evek-1
+    return eletkor
 
 
