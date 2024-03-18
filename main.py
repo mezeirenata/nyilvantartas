@@ -14,7 +14,7 @@ from textual.widgets import (
     Pretty,
     TextArea,
 )
-from textual.containers import Container
+from textual.containers import Container, Horizontal
 from diak import *
 from tanar import *
 from opciok import *
@@ -36,7 +36,7 @@ class KretaApp(App):
         border: tall $success;
     }
     Input {
-        width: 50%;
+        width: 24%;
     }
     .centerCont {
         align: center middle;
@@ -82,6 +82,11 @@ class KretaApp(App):
     #tanarHazikInputOsztaly {
         width: 15;
     }
+    .overflow {
+        overflow: auto;
+        border: round white;
+    }
+   
     """
 
     # globális email, jelszó változó
@@ -108,40 +113,31 @@ class KretaApp(App):
                 ),
                 classes="centerCont",
             ),
-            Container(
+            Horizontal(
                 Button(label="Bejelentkezés", id="loginBtn", classes="btn"),
-                classes="centerCont",
-            ),
-            Container(
                 Button(label="Reset", id="resetBtn", classes="btn"),
                 classes="centerCont",
             ),
             id="loginScreen",
         )
 
+        # diák nézet
         yield Container(
             Button("Kijelentkezés", id="logoutBtn", classes="btn"),
             Label("", classes="loginLabel", id="diakLoginLabel"),
-            Button("Órarend", id="diakOrarendBtn", classes="btn"),
-            Button("Jegyek", id="diakJegyekBtn", classes="btn"),
-            Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+            Horizontal(
+                Button("Órarend", id="diakOrarendBtn", classes="btn"),
+                Button("Jegyek", id="diakJegyekBtn", classes="btn"),
+                Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+            ),
             Pretty("", id="osztondij"),
             id="diakScreen",
         )
-
-        yield Container(
-            Button("Kijelentkezés", id="logoutBtn", classes="btn"),
-            Label("", classes="loginLabel", id="tanarLoginLabel"),
-            Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
-            Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
-            Pretty("", id="targyak"),
-            id="tanarScreen",
-        )
-        # diák nézetek
         yield Container(
             Label("Órarend", id="diakOrarendLabel", classes="label"),
             DataTable(id="diakOrarend"),
             id="diakOrarendView",
+            classes="overflow",
         )
 
         yield Container(
@@ -154,24 +150,38 @@ class KretaApp(App):
             ),
             Label("", id="diakJegyek"),
             id="diakJegyekView",
+            classes="overflow",
         )
 
         yield Container(
             Label("Házi feladatok", id="diakHazikLabel", classes="label"),
             Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
             id="diakHaziView",
+            classes="overflow",
         )
-        # tanár nézetek
+        # tanár nézet
+        yield Container(
+            Button("Kijelentkezés", id="logoutBtn", classes="btn"),
+            Label("", classes="loginLabel", id="tanarLoginLabel"),
+            Horizontal(
+                Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
+                Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
+            ),
+            Pretty("", id="targyak"),
+            id="tanarScreen",
+        )
         yield Container(
             Label("Órarend", id="tanarOrarendLabel", classes="label"),
             DataTable(id="tanarOrarend"),
             id="tanarOrarendView",
+            classes="overflow",
         )
 
         yield Container(
             Label("", id="tanarJegyekLabel", classes="label"),
             Label("", id="tanarJegyek"),
             id="tanarJegyekView",
+            classes="overflow",
         )
 
         yield Container(
@@ -192,14 +202,17 @@ class KretaApp(App):
             Label("Feladat:", classes="label"),
             TextArea(id="tanarHazikArea", soft_wrap=True, show_line_numbers=False),
             id="tanarHaziView",
+            classes="overflow",
         )
 
     def on_mount(self):
         self.query_one("#diakScreen").display = False
         self.query_one("#tanarScreen").display = False
+
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarJegyekView").display = False
