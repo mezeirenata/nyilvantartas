@@ -93,3 +93,28 @@ def bukasra_vagynem(diak_neve: str, tanar) -> bool:
                             if round(value) == 1:
                                 return True
     return False
+
+def Felhasznalo_lekerese(felhasznalo:str) -> Diak|Tanar|None:
+    for d in diakok:
+        if d.nev == felhasznalo:
+            return d
+    for t in tanarok:
+        if t.nev == felhasznalo:
+            return t
+    return None 
+
+def DiákVagyNem(felhasznalo:str) -> bool|None:
+    # True = Diák
+    # False - Tanár
+    # None - egyik sem
+    for d in diakok:
+        if d.nev == felhasznalo:
+            return True
+    for t in tanarok:
+        if t.nev == felhasznalo:
+            return False
+    return None
+    
+
+
+
