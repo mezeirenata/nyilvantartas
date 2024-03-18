@@ -1,5 +1,5 @@
 # KRÉTA 2.0
- ## Egy jobb Kréta alkalmazás.
+## Egy jobb Kréta alkalmazás.
 
 ## Készítők:
 - Mezei Renáta
@@ -18,7 +18,6 @@
 - Hiányzások (feljegyzés, megtekintés, igazolás)
 - Jegyek (feljegyzés, megtekintés, átlag számítás)
 - Figyelmeztetések (feljegyzés, megtekintés)
-- Szerkesztés (tanárok, diákok felvétele)
 - Egyéb statisztikai adatok (pl. bukásra álló tanulók)
 
 ### Adat fájlok (csv):
