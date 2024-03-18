@@ -130,4 +130,54 @@ def Eletkor(szuletesi_datum:str, mai_datum:str) -> int:
         eletkor  = eltelt_evek-1
     return eletkor
 
+def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
+    tanar_vagy_diak = input('Feljegyzendő személy: 0 - Tanár, 1 - Tanuló: ')
+    match tanar_vagy_diak:
+        case '0':
+            #Tanár
+            tanar_nev = str(input('Pedagógus neve (Vezetéknév Keresztnév): '))
+            tanar_osztalyok = str(input('A tanító által tanított osztály(ok) (11NY, 9B): '))
+            tanar_email = str(input('A pedagógus E-mail címe:(vezeteknev.keresztnev@gmail.com): '))
+            tanar_jelszo = str(input('Az új felhasználó belépési jelszava: '))
+            tanar_targyak = str('A tanító által tanított tantárgy(ak) :')
 
+            f = open(tanarok_file, 'w', encoding='utf-8')
+            f.write(f'{tanar_nev};{tanar_osztalyok};{tanar_email};{tanar_jelszo};{tanar_targyak}\n')
+            f.close()
+            f = open(tanarok_file,'r',encoding='utf-8')
+            tanarok = []
+            for row in f:
+                tanarok.append(Tanar(row))
+            f.close()
+            
+        case '1':
+            #Diák
+            diak_nev = str(input('Tanuló neve (Vezetéknév Keresztnév): '))
+            diak_osztaly = str(input('Tanuló osztálya (11NY): '))
+            diak_email = str(input('Tanuló E-mail címe:(vezeteknev.keresztnev@gmail.com): '))
+            diak_jelszo = str(input('Az új felhasználó belépési jelszava: '))
+            tori = str(input('Az új tanuló meglévő Történelem jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            info = str(input('Az új tanuló meglévő Informatika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            angol = str(input('Az új tanuló meglévő Angol idegennyelv jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            irod = str(input('Az új tanuló meglévő Irodalom jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            nyt = str(input('Az új tanuló meglévő Nyelvtan jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            tesi = str(input('Az új tanuló meglévő Testnevelés jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            matek = str(input('Az új tanuló meglévő Matematika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            fizika = str(input('Az új tanuló meglévő Fizika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
+            diak_jegyei = tori + ";" + info + ";" + angol + ";" + irod + ";" + nyt + ";" + tesi + ";" + matek + ";" + fizika
+            f = open(diakok_file, "w", encoding = 'utf-8')
+            f.write(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n')
+            f.close()
+
+            f = open(diakok_file, 'r', encoding='utf-8')
+            for row in f:
+                diakok = []
+                row = row + ";" + diak_jegyei
+                diakok.append(Diak(row))
+            f.close()
+
+            f = open(jegyek_file, 'w', encoding = 'utf-8')
+            f.write(f'{diak_nev};{diak_jegyei}\n')
+            f.close()
+
+    
