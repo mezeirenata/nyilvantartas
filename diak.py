@@ -92,17 +92,17 @@ class Diak:
     def osztondij(self):
         dij = 0
         if ("9" in self.osztaly) or ("10" in self.osztaly):
-            dij = 8000
+            dij = "8000 Ft"
         else:
             a = self.tan_atlag
             if a > 4.49:
-                dij = 59000
+                dij = "59000 Ft"
             elif a > 4:
-                dij = 42000
+                dij = "42000 Ft"
             elif a > 3:
-                dij = 25000
+                dij = "25000 Ft"
             elif a > 2:
-                dij = 8000
+                dij = "8000 Ft"
             else:
                 dij = "Nincs"
 

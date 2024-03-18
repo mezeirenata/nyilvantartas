@@ -14,7 +14,7 @@ from textual.widgets import (
     Pretty,
     TextArea,
 )
-from textual.containers import Container, Horizontal
+from textual.containers import Horizontal, Center, Vertical
 from diak import *
 from tanar import *
 from opciok import *
@@ -36,7 +36,8 @@ class KretaApp(App):
         border: tall $success;
     }
     Input {
-        width: 24%;
+        width: 30%;
+        margin-bottom: 2;
     }
     .centerCont {
         align: center middle;
@@ -82,11 +83,35 @@ class KretaApp(App):
     #tanarHazikInputOsztaly {
         width: 15;
     }
+    * {
+        overflow: hidden;
+    }
     .overflow {
         overflow: auto;
         border: round white;
     }
-   
+    #diakOrarend {
+        margin-top: 1;
+        margin-left: 3;
+        border: round blue;
+        width: 64%;
+    }
+    #diakHazik {
+        margin-left: 3;
+    }
+    .btns, #loginScreen {
+        border: round white;
+    }
+    .success {
+        color: green;
+    }
+    .fail {
+        color: red;
+    }
+    #tanarHazikSuccessLabel {
+        margin-top: 1;
+        margin-left: 3;
+    }
     """
 
     # globális email, jelszó változó
@@ -98,13 +123,10 @@ class KretaApp(App):
     # init widgets
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Container(
-            Container(Label("Üdvözöljük!"), classes="centerCont"),
-            Container(
+        yield Center(
+            Vertical(Label("Üdvözöljük!"), classes="centerCont"),
+            Vertical(
                 Input(placeholder="Email", validators=[Function(bad_e)], id="email"),
-                classes="centerCont",
-            ),
-            Container(
                 Input(
                     placeholder="Jelszó",
                     validators=[Function(bad_p)],
@@ -122,87 +144,101 @@ class KretaApp(App):
         )
 
         # diák nézet
-        yield Container(
-            Button("Kijelentkezés", id="logoutBtn", classes="btn"),
-            Label("", classes="loginLabel", id="diakLoginLabel"),
-            Horizontal(
-                Button("Órarend", id="diakOrarendBtn", classes="btn"),
-                Button("Jegyek", id="diakJegyekBtn", classes="btn"),
-                Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+        yield Horizontal(
+            Vertical(
+                Button("Kijelentkezés", id="logoutBtn", classes="btn"),
+                Label("", classes="loginLabel", id="diakLoginLabel"),
+                Horizontal(
+                    Button("Órarend", id="diakOrarendBtn", classes="btn"),
+                    Button("Jegyek", id="diakJegyekBtn", classes="btn"),
+                    Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+                ),
+                classes="btns",
             ),
-            Pretty("", id="osztondij"),
+            Vertical(
+                Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
+                DataTable(id="diakOrarend", zebra_stripes=True),
+                id="diakOrarendView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("", id="diakJegyekLabel", classes="label"),
+                Select(
+                    ((line, line) for line in TARGYAK),
+                    id="diakJegyekSelect",
+                    allow_blank=False,
+                    value="Történelem",
+                ),
+                Label("", id="diakJegyek"),
+                id="diakJegyekView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
+                Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
+                id="diakHaziView",
+                classes="overflow",
+            ),
             id="diakScreen",
         )
-        yield Container(
-            Label("Órarend", id="diakOrarendLabel", classes="label"),
-            DataTable(id="diakOrarend"),
-            id="diakOrarendView",
-            classes="overflow",
-        )
-
-        yield Container(
-            Label("", id="diakJegyekLabel", classes="label"),
-            Select(
-                ((line, line) for line in TARGYAK),
-                id="diakJegyekSelect",
-                allow_blank=False,
-                value="Történelem",
-            ),
-            Label("", id="diakJegyek"),
-            id="diakJegyekView",
-            classes="overflow",
-        )
-
-        yield Container(
-            Label("Házi feladatok", id="diakHazikLabel", classes="label"),
-            Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
-            id="diakHaziView",
-            classes="overflow",
-        )
         # tanár nézet
-        yield Container(
-            Button("Kijelentkezés", id="logoutBtn", classes="btn"),
-            Label("", classes="loginLabel", id="tanarLoginLabel"),
-            Horizontal(
-                Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
-                Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
+        yield Horizontal(
+            Vertical(
+                Button("Kijelentkezés", id="logoutBtn", classes="btn"),
+                Label("", classes="loginLabel", id="tanarLoginLabel"),
+                Horizontal(
+                    Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
+                    Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
+                ),
+                Pretty("", id="targyak"),
+                classes="btns",
             ),
-            Pretty("", id="targyak"),
+            Vertical(
+                Label("Órarend", id="tanarOrarendLabel", classes="label"),
+                DataTable(id="tanarOrarend"),
+                id="tanarOrarendView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("", id="tanarJegyekLabel", classes="label"),
+                Label("", id="tanarJegyek"),
+                id="tanarJegyekView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("", id="tanarHazikLabel", classes="label"),
+                Input(
+                    placeholder="Osztály",
+                    validators=[Function(bad_class)],
+                    id="tanarHazikInputOsztaly",
+                    classes="label",
+                ),
+                Label("Tantárgy:", classes="label"),
+                Select(
+                    ((line, line) for line in TARGYAK),
+                    id="tanarHazikSelect",
+                    allow_blank=False,
+                    value="Történelem",
+                ),
+                Label("Határidő:", classes="label"),
+                Input(
+                    placeholder="YYYY.HH.NN",
+                    validators=[Function(date)],
+                    id="tanarHazikInputHatar",
+                    classes="label",
+                    max_length=10,
+                ),
+                Label("Feladat:", classes="label"),
+                TextArea(id="tanarHazikArea", soft_wrap=True, show_line_numbers=False),
+                Horizontal(
+                    Button("Feljegyzés", id="tanarHazikBtn", classes="btn"),
+                    Button("Reset", id="tanarHazikBtnReset", classes="btn"),
+                ),
+                Label("", classes="label", id="tanarHazikSuccessLabel"),
+                id="tanarHaziView",
+                classes="overflow",
+            ),
             id="tanarScreen",
-        )
-        yield Container(
-            Label("Órarend", id="tanarOrarendLabel", classes="label"),
-            DataTable(id="tanarOrarend"),
-            id="tanarOrarendView",
-            classes="overflow",
-        )
-
-        yield Container(
-            Label("", id="tanarJegyekLabel", classes="label"),
-            Label("", id="tanarJegyek"),
-            id="tanarJegyekView",
-            classes="overflow",
-        )
-
-        yield Container(
-            Label("", id="tanarHazikLabel", classes="label"),
-            Input(
-                placeholder="Osztály",
-                validators=[Function(bad_class)],
-                id="tanarHazikInputOsztaly",
-                classes="label",
-            ),
-            Label("Tantárgy:", classes="label"),
-            Select(
-                ((line, line) for line in TARGYAK),
-                id="tanarHazikSelect",
-                allow_blank=False,
-                value="Történelem",
-            ),
-            Label("Feladat:", classes="label"),
-            TextArea(id="tanarHazikArea", soft_wrap=True, show_line_numbers=False),
-            id="tanarHaziView",
-            classes="overflow",
         )
 
     def on_mount(self):
@@ -277,6 +313,33 @@ class KretaApp(App):
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarHaziView").display = True
         self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarHazikSuccessLabel").display = False
+
+    @on(Button.Pressed, "#tanarHazikBtn")
+    def tanarHazikFeljegyzes(self, event: Button.Pressed) -> None:
+        osztaly = self.query_one("#tanarHazikInputOsztaly").value
+        targy = self.query_one("#tanarHazikSelect").value
+        hatar = self.query_one("#tanarHazikInputHatar").value
+        feladat = self.query_one("#tanarHazikArea").text
+        label = self.query_one("#tanarHazikSuccessLabel")
+        label.display = True
+        if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
+            f = open("csv/hazik.csv", "a", encoding="utf-8")
+            f.write(f"\n---\n{osztaly};{targy};{hatar}\n{feladat}\n---")
+            f.close()
+            label.update("Sikeres feljegyzés!")
+            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nTöltsön ki minden mezőt!")
+            label.classes = "fail"
+
+    @on(Button.Pressed, "#tanarHazikBtnReset")
+    def tanarHazikFeljegyzesReset(self, event: Button.Pressed) -> None:
+        self.query_one("#tanarHazikInputOsztaly").value = ""
+        self.query_one("#tanarHazikSelect").value = "Történelem"
+        self.query_one("#tanarHazikInputHatar").value = ""
+        self.query_one("#tanarHazikArea").text = ""
+        self.query_one("#tanarHazikSuccessLabel").update("")
 
     @on(Button.Pressed, "#loginBtn")
     def login(self, event: Button.Pressed) -> None:
@@ -288,13 +351,12 @@ class KretaApp(App):
                 self.query_one("#diakScreen").display = True
 
                 self.query_one("#diakLoginLabel").update(
-                    f"Bejelentkezve: {d.nev} (diák)"
+                    f"Bejelentkezve: {d.nev} (diák)\nJelenlegi ösztöndíj: {d.osztondij}"
                 )
                 self.query_one("#diakJegyekLabel").update(
-                    f"Jegyek\nTanulmányi átlag: {d.tan_atlag:.2f}"
+                    f"\nJegyek\n\nTanulmányi átlag: {d.tan_atlag:.2f}"
                 )
                 self.query_one("#diakJegyek").display = False
-                self.query_one("#osztondij").update(f"Ösztöndíj: {d.osztondij}")
 
         # tanár bejelentkezés
         for t in tanarok:
@@ -302,7 +364,7 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                text = "Házi feladatok\n\n[Új feljegyzés]\n\n\nOsztály ("
+                text = "\nHázi feladatok\n\n[Új feljegyzés]\n\n\nOsztály ("
                 for i, a in enumerate(t.osztalyok):
                     if i != 0:
                         text += f", {a}"
@@ -335,14 +397,14 @@ class KretaApp(App):
             if d.email == email:
                 string = ""
                 atlag = 0
-                for i, x in enumerate(d.diakJegyek[event.value]):
+                for i, x in enumerate(d.jegyek[event.value]):
                     if i == 0:
                         string += f"{str(x)}"
                     else:
                         string += f", {str(x)}"
 
                     atlag += x
-                atlag = atlag / len(d.diakJegyek[event.value])
+                atlag = atlag / len(d.jegyek[event.value])
                 self.query_one("#diakJegyek").display = True
                 self.query_one("#diakJegyek").update(f"{string}\n\nÁtlag: {atlag:.2f}")
 
@@ -374,10 +436,22 @@ def bad_p(value: str) -> bool:
 
 def bad_class(value: str) -> bool:
     try:
-        for t in tanarok:
-            for x in t.osztalyok:
-                if x == value:
-                    return True
+        for d in diakok:
+            if d.osztaly == value:
+                return True
+    except ValueError:
+        return False
+
+
+def date(value: str) -> bool:
+    try:
+        splitted = value.strip().split(".")
+        if len(splitted) == 3:
+            if (len(splitted[0]) == 4) and (splitted[0].isnumeric()):
+                if (len(splitted[1]) == 2) and (splitted[1].isnumeric()):
+                    if (len(splitted[2]) == 2) and (splitted[2].isnumeric()):
+
+                        return True
     except ValueError:
         return False
 

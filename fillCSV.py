@@ -217,6 +217,10 @@ def password(nameList):
     return password
 
 
+f = open("csv/hazik.csv", "w", encoding="utf-8")
+f.write("Osztály;Tárgy;Határidő;Feladat")
+f.close()
+
 writeDiakok()
 writeJegyek()
 from diak import *
