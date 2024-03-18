@@ -149,7 +149,7 @@ def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
             for row in f:
                 tanarok.append(Tanar(row))
             f.close()
-            
+
         case '1':
             #Diák
             diak_nev = str(input('Tanuló neve (Vezetéknév Keresztnév): '))
@@ -181,3 +181,28 @@ def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
             f.close()
 
     
+def EltavolitasTanuloDiak(eltavolitando_neve:str) -> None:
+    eltavolitando = Felhasznalo_lekerese(eltavolitando_neve)
+    if eltavolitando in diakok:
+        diakok.remove(eltavolitando)
+        f = open("csv/diakok.csv", 'w', encoding='utf-8')
+        for row in f:
+            f.remove(row)
+        for d in diakok:
+            f.write(f'{d}\n')
+        f.close()
+
+        f = open("csv/jegyek.csv", 'w', encoding='utf-8')
+        for row in f:
+            if eltavolitando.nev in row:
+                f.remove(row)
+        f.close()
+
+    elif eltavolitando in tanarok:
+        tanarok.remove(eltavolitando)
+        f = open("csv/tanarok.csv", 'w', encoding='utf-8')
+        for row in f:
+            f.remove(row)
+        for t in tanarok:
+            f.write(f'{t}\n')
+        f.close()
