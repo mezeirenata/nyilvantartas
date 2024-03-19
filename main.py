@@ -13,12 +13,13 @@ from textual.widgets import (
     DataTable,
     Pretty,
     TextArea,
+    Collapsible,
 )
 from textual.containers import Horizontal, Center, Vertical
 from diak import *
 from tanar import *
 from opciok import *
-
+from hazik import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
@@ -94,7 +95,7 @@ class KretaApp(App):
         margin-top: 1;
         margin-left: 3;
         border: round blue;
-        width: 64%;
+        width: 70%;
     }
     #diakHazik {
         margin-left: 3;
@@ -111,6 +112,12 @@ class KretaApp(App):
     #tanarHazikSuccessLabel {
         margin-top: 1;
         margin-left: 3;
+        margin-bottom: 8;
+    }
+    .hazik {
+        margin-left: 4;
+        margin-top: 1;
+        width: 50%;
     }
     """
 
@@ -176,11 +183,66 @@ class KretaApp(App):
             Vertical(
                 Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
                 Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
                 id="diakHaziView",
                 classes="overflow",
             ),
             id="diakScreen",
         )
+
         # tanár nézet
         yield Horizontal(
             Vertical(
@@ -277,12 +339,6 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = True
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = False
-        for d in diakok:
-            if d.email == email:
-                table: DataTable = self.query_one("#diakOrarend")
-                table.clear(True)
-                table.add_columns(*d.orarend[0])
-                table.add_rows(d.orarend[1:])
 
     @on(Button.Pressed, "#diakJegyekBtn")
     def diakJegyek(self, event: Button.Pressed) -> None:
@@ -325,7 +381,7 @@ class KretaApp(App):
         label.display = True
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
-            f.write(f"\n---\n{osztaly};{targy};{hatar}\n{feladat}\n---")
+            f.write(f"START\n{osztaly};{targy};{hatar};\n{feladat}\nEND\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
@@ -357,6 +413,15 @@ class KretaApp(App):
                     f"\nJegyek\n\nTanulmányi átlag: {d.tan_atlag:.2f}"
                 )
                 self.query_one("#diakJegyek").display = False
+                table: DataTable = self.query_one("#diakOrarend")
+                table.clear(True)
+                table.add_columns(*d.orarend[0])
+                table.add_rows(d.orarend[1:])
+
+                
+
+                for a in self.query(".hazik"):
+                    a.title = "x"
 
         # tanár bejelentkezés
         for t in tanarok:
