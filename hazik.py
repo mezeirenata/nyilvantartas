@@ -1,5 +1,4 @@
-
-class Hazi():
+class Hazi:
     def __init__(self, osztaly, targy, hatarido, feladat) -> None:
         self.osztaly = osztaly
         self.targy = targy
@@ -7,43 +6,41 @@ class Hazi():
         self.feladat = feladat
 
 
-
-
-
 hazik = []
-def readHazik():
+
+
+def readHazik(osztaly):
     f = open("csv/hazik.csv", "r", encoding="utf-8")
     f.readline()
-    osszesHazi = ""
-    first = bool
-    for line in f:
+    lines = f.readlines()
+
+    hazi = []
+    for line in lines:
         line = line.strip()
-        if line == "START":
-            first = True
-        elif first:
-            osszesHazi += f"{line};"
+
         if line == "END":
-            first = False
-            
-            
-        
-        
+            feladat = ""
+            for x, h in enumerate(hazi[3:]):
+                if x != 0:
+                    feladat += f"\n{h}"
+                else:
+                    feladat += f"{h}"
 
+            hazik.append(Hazi(hazi[0], hazi[1], hazi[2], feladat))
+            hazi = []
 
-    
-    
-    splitted = osszesHazi.split(";")
-    lista = []
-    a = ""
-    for i, s in enumerate(splitted):
-        if s != "END":
-            lista.append(s)
         else:
-            a = i
-    hazik.append(Hazi(lista[0], lista[1], lista[2], lista[3:a]))
-        
+            hazi.append(line)
 
     f.close()
 
-readHazik()
-print(hazik[0].feladat)
+    diakHazik = []
+    for h in hazik:
+        if h.osztaly == osztaly:
+
+            diakHazik.append(h)
+
+    if diakHazik != []:
+        return diakHazik
+    else:
+        return None

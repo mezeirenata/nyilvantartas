@@ -95,7 +95,7 @@ class KretaApp(App):
         margin-top: 1;
         margin-left: 3;
         border: round blue;
-        width: 70%;
+        width: 63%;
     }
     #diakHazik {
         margin-left: 3;
@@ -118,6 +118,9 @@ class KretaApp(App):
         margin-left: 4;
         margin-top: 1;
         width: 50%;
+    }
+    .screen {
+        width: 35%;
     }
     """
 
@@ -160,7 +163,7 @@ class KretaApp(App):
                     Button("Jegyek", id="diakJegyekBtn", classes="btn"),
                     Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
                 ),
-                classes="btns",
+                classes="btns screen",
             ),
             Vertical(
                 Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
@@ -182,7 +185,13 @@ class KretaApp(App):
             ),
             Vertical(
                 Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
-                Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
+                Label("", id="diakHazik"),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
                 Collapsible(
                     Label("", classes="hazikContent"),
                     collapsed=True,
@@ -253,7 +262,7 @@ class KretaApp(App):
                     Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
                 ),
                 Pretty("", id="targyak"),
-                classes="btns",
+                classes="btns screen",
             ),
             Vertical(
                 Label("Órarend", id="tanarOrarendLabel", classes="label"),
@@ -314,6 +323,7 @@ class KretaApp(App):
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarJegyekView").display = False
+
         self.title = "Kréta 2.0"
 
     # handle button presses
@@ -381,7 +391,7 @@ class KretaApp(App):
         label.display = True
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
-            f.write(f"START\n{osztaly};{targy};{hatar};\n{feladat}\nEND\n")
+            f.write(f"{osztaly}\n{targy}\n{hatar}\n{feladat}\nEND\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
@@ -418,10 +428,28 @@ class KretaApp(App):
                 table.add_columns(*d.orarend[0])
                 table.add_rows(d.orarend[1:])
 
-                
-
                 for a in self.query(".hazik"):
-                    a.title = "x"
+                    a.display = False
+
+                diakHazik = readHazik(d.osztaly)
+
+                if diakHazik != None:
+                    k = 0
+                    for a in self.query(".hazik")[0 : len(diakHazik)]:
+                        a.title = (
+                            f"{diakHazik[k].targy} - Határidő: {diakHazik[k].hatarido}"
+                        )
+                        a.display = True
+                        k += 1
+
+                    k = 0
+                    for a in self.query(".hazikContent")[0 : len(diakHazik)]:
+                        a.update(diakHazik[k].feladat)
+                        k += 1
+                else:
+                    self.query_one("#diakHazik").update(
+                        "Nincsenek feljegyzett házi feladatok."
+                    )
 
         # tanár bejelentkezés
         for t in tanarok:
