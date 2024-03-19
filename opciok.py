@@ -165,44 +165,62 @@ def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
             matek = str(input('Az új tanuló meglévő Matematika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
             fizika = str(input('Az új tanuló meglévő Fizika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
             diak_jegyei = tori + ";" + info + ";" + angol + ";" + irod + ";" + nyt + ";" + tesi + ";" + matek + ";" + fizika
+
             f = open(diakok_file, "w", encoding = 'utf-8')
+            for d in diakok:
+                f.write(f'{d.nev};{d.osztaly};{d.email};{d.jelszo}\n')
             f.write(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n')
             f.close()
 
             f = open(diakok_file, 'r', encoding='utf-8')
             for row in f:
-                diakok = []
-                row = row + ";" + diak_jegyei
-                diakok.append(Diak(row))
+                if diak_nev in row:
+                    row = row + ";" + diak_jegyei
+                    diakok.append(Diak(row))
             f.close()
+            
+            f2=open(jegyek_file, 'r', encoding='utf-8')
+            f2.readline()
+            lines = f2.readlines()
+            f2.close()
 
-            f = open(jegyek_file, 'w', encoding = 'utf-8')
-            f.write(f'{diak_nev};{diak_jegyei}\n')
-            f.close()
+            f2 = open(jegyek_file, 'w', encoding = 'utf-8')
+            for line in lines:
+                f2.write(line)
+            f2.write(f'{diak_nev};{diak_jegyei}\n')
+            f2.close()
 
     
-def EltavolitasTanuloDiak(eltavolitando_neve:str) -> None:
+def EltavolitasTanarDiak(eltavolitando_neve:str) -> None:
     eltavolitando = Felhasznalo_lekerese(eltavolitando_neve)
     if eltavolitando in diakok:
         diakok.remove(eltavolitando)
-        f = open("csv/diakok.csv", 'w', encoding='utf-8')
-        for row in f:
-            f.remove(row)
+        file=open("csv/diakok.csv", 'w', encoding='utf-8')
+        file.write('Név;Osztály;Email;Jelszó\n')
         for d in diakok:
-            f.write(f'{d}\n')
-        f.close()
-
-        f = open("csv/jegyek.csv", 'w', encoding='utf-8')
-        for row in f:
-            if eltavolitando.nev in row:
-                f.remove(row)
-        f.close()
+            file.write(f'{d.nev};{d.osztaly};{d.email};{d.jelszo}\n')
+        file.close()
+        
 
     elif eltavolitando in tanarok:
         tanarok.remove(eltavolitando)
-        f = open("csv/tanarok.csv", 'w', encoding='utf-8')
-        for row in f:
-            f.remove(row)
+        file=open("csv/tanarok.csv", 'w', encoding='utf-8')
+        file.write('Név;Osztályok;Email;Jelszó;Tárgyak\n')
         for t in tanarok:
-            f.write(f'{t}\n')
-        f.close()
+            file.write(f'{t.nev};{t.osztalyok[0:]};{t.email};{t.jelszo};{t.targyak[0:]}\n')
+        file.close()
+
+
+def HanyadikSor(nev:str) -> int:
+    eltavolitando = Felhasznalo_lekerese(nev)
+    sor = 0
+    if eltavolitando in diakok:
+        for item, index in enumerate(diakok):
+            if item == eltavolitando:
+                sor = index
+    elif eltavolitando in tanarok:
+        for item, index in enumerate(tanarok):
+            if item == eltavolitando:
+                sor = index
+    return sor
+
