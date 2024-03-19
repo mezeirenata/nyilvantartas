@@ -15,12 +15,15 @@ class Diak:
         f = open("csv/jegyek.csv", "r", encoding="utf-8")
         for i, sor in enumerate(f):
             splitted = sor.strip().split(";")
+
             if i == 0:
                 targyak = sor.strip().split(";")
                 for t in targyak:
                     if t != "Név":
                         dictionary[t] = []
-            else:
+                global d
+                d = dictionary
+            elif splitted[1] != "":
                 if splitted[0] == self.nev:
                     for x, s in enumerate(splitted[1:]):
                         splitted2 = s.split(",")
@@ -33,16 +36,17 @@ class Diak:
 
     def tanAtlag(self):
         tan_atlag = 0
-        atlag_lista = []
-        for lista in self.jegyek.values():
-            atlag = 0
-            for x in lista:
-                atlag += x
-            atlag = atlag / len(lista)
-            atlag_lista.append(atlag)
-        for i in atlag_lista:
-            tan_atlag += i
-        tan_atlag = tan_atlag / len(atlag_lista)
+        if self.jegyek != d:
+            atlag_lista = []
+            for lista in self.jegyek.values():
+                atlag = 0
+                for x in lista:
+                    atlag += x
+                atlag = atlag / len(lista)
+                atlag_lista.append(atlag)
+            for i in atlag_lista:
+                tan_atlag += i
+            tan_atlag = tan_atlag / len(atlag_lista)
 
         return tan_atlag
 

@@ -224,6 +224,7 @@ f.close()
 writeDiakok()
 writeJegyek()
 from diak import *
-
+from opciok import *
 writeOrarend()
 writeTanarok()
+MentesHozzaadas("csv/tanarok.csv", "csv/jegyek.csv", "csv/diakok.csv")
