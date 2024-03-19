@@ -1,0 +1,15 @@
+.navbar-nav .nav-link.text-info {
+    color: #9ec5fe !important;
+}
+
+.navbar-nav .nav-link.text-info:hover {
+    color: white !important;
+    text-decoration: underline !important;
+    text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #9ec5fe, 0 0 30px #9ec5fe, 0 0 40px #9ec5fe, 0 0 55px #9ec5fe, 0 0 75px #9ec5fe;
+}
+
+.navbar-brand:hover img {
+    box-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #9ec5fe, 0 0 30px #9ec5fe, 0 0 40px #9ec5fe, 0 0 55px #9ec5fe, 0 0 75px #9ec5fe;
+}
+
+
