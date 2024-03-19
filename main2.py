@@ -2,5 +2,5 @@ from opciok import *
 from diak import*
 from tanar import *
 
-EltavolitasTanarDiak('Deák Kristóf')
+MentesHozzaadas("csv/tanarok.csv", "csv/jegyek.csv", "csv/diakok.csv")
 # MentesHozzaadas("tanarok.csv","jegyek.csv","diakok.csv")
