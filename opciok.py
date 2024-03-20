@@ -161,7 +161,7 @@ def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
             f.write(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n')
             f.close()
             f = open(jegyek_file, "a", encoding="utf-8")
-            f.write(f"{diak_nev};;;;;;;;")
+            f.write(f"{diak_nev};0;0;0;0;0;0;0;0")
             f.close()
             diakok.append(Diak(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n'))
 

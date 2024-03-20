@@ -23,7 +23,7 @@ class Diak:
                         dictionary[t] = []
                 global d
                 d = dictionary
-            elif splitted[1] != "":
+            else:
                 if splitted[0] == self.nev:
                     for x, s in enumerate(splitted[1:]):
                         splitted2 = s.split(",")
@@ -36,17 +36,16 @@ class Diak:
 
     def tanAtlag(self):
         tan_atlag = 0
-        if self.jegyek != d:
-            atlag_lista = []
-            for lista in self.jegyek.values():
-                atlag = 0
-                for x in lista:
-                    atlag += x
-                atlag = atlag / len(lista)
-                atlag_lista.append(atlag)
-            for i in atlag_lista:
-                tan_atlag += i
-            tan_atlag = tan_atlag / len(atlag_lista)
+        atlag_lista = []
+        for lista in self.jegyek.values():
+            atlag = 0
+            for x in lista:
+                atlag += x
+            atlag = atlag / len(lista)
+            atlag_lista.append(atlag)
+        for i in atlag_lista:
+            tan_atlag += i
+        tan_atlag = tan_atlag / len(atlag_lista)
 
         return tan_atlag
 

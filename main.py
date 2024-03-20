@@ -416,7 +416,7 @@ class KretaApp(App):
                 self.query_one("#diakScreen").display = True
 
                 self.query_one("#diakLoginLabel").update(
-                    f"Bejelentkezve: {d.nev} (diák)\nJelenlegi ösztöndíj: {d.osztondij}"
+                    f"Bejelentkezve: {d.nev} (diák)\nOsztály: {d.osztaly}\n\nJelenlegi ösztöndíj: {d.osztondij}"
                 )
                 self.query_one("#diakJegyekLabel").update(
                     f"\nJegyek\n\nTanulmányi átlag: {d.tan_atlag:.2f}"
