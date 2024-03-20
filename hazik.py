@@ -6,10 +6,8 @@ class Hazi:
         self.feladat = feladat
 
 
-hazik = []
-
-
 def readHazik(osztaly):
+    hazik = []
     f = open("csv/hazik.csv", "r", encoding="utf-8")
     f.readline()
     lines = f.readlines()

@@ -46,6 +46,8 @@ class KretaApp(App):
     .btn {
         text-style: none;
         margin: 3;
+        border: round white;
+        background: rgba(0,0,0,0);
     }
     .loginLabel {
         margin: 2 3;
@@ -70,8 +72,14 @@ class KretaApp(App):
         margin-bottom: 1;
     }
     #logoutBtn {
-        background: red 60%;
+        background: red 30%;
         color: auto;
+    }
+    #logoutBtn:hover {
+        background: red 20%;
+    }
+    .btn:hover {
+        background: rgba(0,0,0,0.4);
     }
     #tanarHazikArea {
         width: 50%;
@@ -112,7 +120,6 @@ class KretaApp(App):
     #tanarHazikSuccessLabel {
         margin-top: 1;
         margin-left: 3;
-        margin-bottom: 8;
     }
     .hazik {
         margin-left: 4;
@@ -430,18 +437,14 @@ class KretaApp(App):
                 for a in self.query(".hazik"):
                     a.display = False
 
-                diakHazik = readHazik(d.osztaly)
-                
-                if diakHazik != None:
-                    for g, e in enumerate(diakHazik):
-                        a = self.query(".hazik")[g]
-                        if a.title == "":
-                            a.title = (
-                                f"{e.targy} - Határidő: {e.hatarido}"
-                            )
-                            a.display = True
-                        
-                            self.query(".hazikContent")[g].update(e.feladat)
+                osszesdiakhazi = readHazik(d.osztaly)
+
+                if osszesdiakhazi != None:
+                    for g, e in enumerate(osszesdiakhazi):
+                        a = self.query(".hazik")[0 : len(osszesdiakhazi)][g]
+                        a.title = f"{e.targy} - Határidő: {e.hatarido}"
+                        a.display = True
+                        self.query(".hazikContent")[g].update(e.feladat)
                 else:
                     self.query_one("#diakHazik").update(
                         "Nincsenek feljegyzett házi feladatok."
