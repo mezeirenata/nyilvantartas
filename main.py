@@ -412,7 +412,6 @@ class KretaApp(App):
         # diák bejelentkezés
         for d in diakok:
             if d.email == email and d.jelszo == password:
-
                 self.query_one("#loginScreen").display = False
                 self.query_one("#diakScreen").display = True
 
@@ -432,20 +431,17 @@ class KretaApp(App):
                     a.display = False
 
                 diakHazik = readHazik(d.osztaly)
-
+                
                 if diakHazik != None:
-                    k = 0
-                    for a in self.query(".hazik")[0 : len(diakHazik)]:
-                        a.title = (
-                            f"{diakHazik[k].targy} - Határidő: {diakHazik[k].hatarido}"
-                        )
-                        a.display = True
-                        k += 1
-
-                    k = 0
-                    for a in self.query(".hazikContent")[0 : len(diakHazik)]:
-                        a.update(diakHazik[k].feladat)
-                        k += 1
+                    for g, e in enumerate(diakHazik):
+                        a = self.query(".hazik")[g]
+                        if a.title == "":
+                            a.title = (
+                                f"{e.targy} - Határidő: {e.hatarido}"
+                            )
+                            a.display = True
+                        
+                            self.query(".hazikContent")[g].update(e.feladat)
                 else:
                     self.query_one("#diakHazik").update(
                         "Nincsenek feljegyzett házi feladatok."
