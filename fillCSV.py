@@ -227,4 +227,5 @@ from diak import *
 from opciok import *
 writeOrarend()
 writeTanarok()
-MentesHozzaadas("csv/tanarok.csv", "csv/jegyek.csv", "csv/diakok.csv")
+while True:
+    MentesHozzaadas("csv/tanarok.csv", "csv/jegyek.csv", "csv/diakok.csv")
