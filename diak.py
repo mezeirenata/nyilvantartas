@@ -34,6 +34,19 @@ class Diak:
         f.close()
         return dictionary
 
+    def addJegy(self, targy, jegy):
+        for a in self.jegyek.keys():
+            if a == targy:
+                self.jegyek[targy].append(int(jegy))
+        f = open("csv/jegyek.csv", "w+", encoding="utf-8")
+        lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            splitted = line.split(";")
+            if splitted[0] == self.nev:
+                pass
+        f.close()
+
     def tanAtlag(self):
         tan_atlag = 0
         atlag_lista = []

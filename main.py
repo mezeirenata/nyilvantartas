@@ -28,6 +28,7 @@ OSZTALYOK = []
 for d in diakok:
     if d.osztaly not in OSZTALYOK:
         OSZTALYOK.append(d.osztaly)
+OSZTALYOK.sort()
 
 
 # app
@@ -57,19 +58,22 @@ class KretaApp(App):
     .loginLabel {
         margin: 2 3;
         color: auto;
-        background: white 25%;
+        background: white 10%;
         padding: 1;
+        border: round white;
     }
     .label {
         margin-left: 3;
+        margin-top: 1;
         margin-bottom: 1;
     }
     #diakJegyek {
         margin-top: 2;
         margin-left: 6;
-        background: blue 30%;
+        background: blue 15%;
         color: auto;
         padding: 1 3;
+        border: round blue;
     }
     #diakJegyekSelect, #tanarHazikSelect {
         width: 35%;
@@ -78,7 +82,11 @@ class KretaApp(App):
     }
     #logoutBtn {
         background: red 30%;
+        border: round red;
         color: auto;
+    }
+    Collapsible {
+        border: round white;
     }
     #logoutBtn:hover {
         background: red 20%;
@@ -94,7 +102,7 @@ class KretaApp(App):
     #tanarHaziView {
         overflow: auto;
     }
-    #tanarHazikInputOsztaly {
+    #tanarHazikInputOsztaly, #tanarJegyekSelectOsztaly, #tanarErdemjegySelect {
         width: 15;
     }
     * {
@@ -122,7 +130,7 @@ class KretaApp(App):
     .fail {
         color: red;
     }
-    #tanarHazikSuccessLabel {
+    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel {
         margin-top: 1;
         margin-left: 3;
     }
@@ -133,6 +141,15 @@ class KretaApp(App):
     }
     .screen {
         width: 35%;
+    }
+    Checkbox {
+        width: 50;
+        border: round white;
+        margin-left: 3;
+        background: rgba(0,0,0,0);
+    }
+    Select {
+        width: 40%;
     }
     """
 
@@ -284,7 +301,7 @@ class KretaApp(App):
             ),
             Vertical(
                 Label(
-                    "Új jegy feljegyzése\n\nOsztály:",
+                    "Új jegy feljegyzése\n\n\nOsztály:",
                     id="tanarJegyekLabel",
                     classes="label",
                 ),
@@ -293,55 +310,50 @@ class KretaApp(App):
                     id="tanarJegyekSelectOsztaly",
                     allow_blank=False,
                     value="10B",
+                    classes="label",
                 ),
                 Label("Diákok:", classes="label"),
-                Vertical(
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                    Checkbox("", classes="tanarJegyekCheckbox"),
-                ),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
                 Label("Tantárgy:", classes="label"),
                 Select(
                     ((line, line) for line in TARGYAK),
                     id="tanarJegyekSelect",
                     allow_blank=False,
                     value="Történelem",
+                    classes="label",
                 ),
+                Label("Érdemjegy:", classes="label"),
+                Select(
+                    ((line, line) for line in ["5", "4", "3", "2", "1"]),
+                    id="tanarErdemjegySelect",
+                    allow_blank=False,
+                    value="5",
+                    classes="label",
+                ),
+                Button("Feljegyzés", classes="label btn", id="tanarJegyFeljegyzesBtn"),
+                Label("", id="tanarJegyFeljegyzesSuccessLabel", classes="label"),
                 id="tanarJegyekView",
                 classes="overflow",
             ),
             Vertical(
                 Label("", id="tanarHazikLabel", classes="label"),
-                Input(
-                    placeholder="Osztály",
-                    validators=[Function(bad_class)],
+                Select(
+                    ((line, line) for line in OSZTALYOK),
                     id="tanarHazikInputOsztaly",
+                    allow_blank=False,
+                    value="10B",
                     classes="label",
                 ),
                 Label("Tantárgy:", classes="label"),
@@ -353,11 +365,11 @@ class KretaApp(App):
                 ),
                 Label("Határidő:", classes="label"),
                 Input(
-                    placeholder="YYYY.HH.NN",
+                    placeholder="YYYY.MM.DD.",
                     validators=[Function(date)],
                     id="tanarHazikInputHatar",
                     classes="label",
-                    max_length=10,
+                    max_length=11,
                 ),
                 Label("Feladat:", classes="label"),
                 TextArea(id="tanarHazikArea", soft_wrap=True, show_line_numbers=False),
@@ -433,6 +445,7 @@ class KretaApp(App):
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarJegyekView").display = True
+        self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
 
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
@@ -467,6 +480,29 @@ class KretaApp(App):
         self.query_one("#tanarHazikArea").text = ""
         self.query_one("#tanarHazikSuccessLabel").update("")
 
+    @on(Button.Pressed, "#tanarJegyFeljegyzesBtn")
+    def tanarJegyFeljegyzes(self, event: Button.Pressed) -> None:
+
+        label = self.query_one("#tanarJegyFeljegyzesSuccessLabel")
+        label.display = True
+        filled = False
+        for a in self.query(".tanarJegyekCheckbox"):
+            if a.value == True:
+                filled = True
+        if filled:
+            for a in self.query(".tanarJegyekCheckbox"):
+                if a.value == True:
+                    for d in diakok:
+                        if d.nev == str(a.label):
+                            targy = self.query_one("#tanarJegyekSelect").value
+                            jegy = self.query_one("#tanarErdemjegySelect").value
+                            d.addJegy(targy, jegy)
+                            label.update("Sikeres feljegyzés!")
+                            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nVálasszon ki legalább egy diákot!")
+            label.classes = "fail"
+
     @on(Button.Pressed, "#loginBtn")
     def login(self, event: Button.Pressed) -> None:
         # diák bejelentkezés
@@ -494,7 +530,7 @@ class KretaApp(App):
 
                 if osszesdiakhazi != None:
                     for g, e in enumerate(osszesdiakhazi):
-                        a = self.query(".hazik")[0 : len(osszesdiakhazi)][g]
+                        a = self.query(".hazik")[g]
                         a.title = f"{e.targy} - Határidő: {e.hatarido}"
                         a.display = True
                         self.query(".hazikContent")[g].update(e.feladat)
@@ -509,7 +545,7 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                text = "\nHázi feladatok\n\n[Új feljegyzés]\n\n\nOsztály ("
+                text = "\nÚj házi feladat feljegyzése\n\n\nOsztály ("
                 for i, a in enumerate(t.osztalyok):
                     if i != 0:
                         text += f", {a}"
@@ -526,7 +562,7 @@ class KretaApp(App):
                 )
                 for a in self.query(".tanarJegyekCheckbox"):
                     a.display = False
-
+                    a.value = False
                 osztalyDiakjai = []
                 osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
                 for x in diakok:
@@ -534,11 +570,11 @@ class KretaApp(App):
                         osztalyDiakjai.append(x.nev)
 
                 for g, e in enumerate(osztalyDiakjai):
-                    a = self.query(".tanarJegyekCheckbox")[0 : len(osztalyDiakjai)][g]
+                    a = self.query(".tanarJegyekCheckbox")[g]
                     a.label = e
                     a.display = True
 
-    # handle email, password change
+    # handle change
     @on(Input.Changed, "#email")
     def changeEmail(self, event: Input.Changed):
         global email
@@ -568,8 +604,10 @@ class KretaApp(App):
 
     @on(Select.Changed, "#tanarJegyekSelectOsztaly")
     def tanarJegyekSelect_changed(self, event: Select.Changed) -> None:
+        self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
         for a in self.query(".tanarJegyekCheckbox"):
             a.display = False
+            a.value = False
         osztalyDiakjai = []
         osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
         for x in diakok:
@@ -577,7 +615,7 @@ class KretaApp(App):
                 osztalyDiakjai.append(x.nev)
 
         for g, e in enumerate(osztalyDiakjai):
-            a = self.query(".tanarJegyekCheckbox")[0 : len(osztalyDiakjai)][g]
+            a = self.query(".tanarJegyekCheckbox")[g]
             a.label = e
             a.display = True
 
@@ -607,24 +645,15 @@ def bad_p(value: str) -> bool:
         return False
 
 
-def bad_class(value: str) -> bool:
-    try:
-        for d in diakok:
-            if d.osztaly == value:
-                return True
-    except ValueError:
-        return False
-
-
 def date(value: str) -> bool:
     try:
         splitted = value.strip().split(".")
-        if len(splitted) == 3:
+        if len(splitted) == 4:
             if (len(splitted[0]) == 4) and (splitted[0].isnumeric()):
                 if (len(splitted[1]) == 2) and (splitted[1].isnumeric()):
                     if (len(splitted[2]) == 2) and (splitted[2].isnumeric()):
-
-                        return True
+                        if splitted[3] == "":
+                            return True
     except ValueError:
         return False
 
