@@ -14,6 +14,7 @@ from textual.widgets import (
     Pretty,
     TextArea,
     Collapsible,
+    Checkbox,
 )
 from textual.containers import Horizontal, Center, Vertical
 from diak import *
@@ -23,6 +24,10 @@ from hazik import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
+OSZTALYOK = []
+for d in diakok:
+    if d.osztaly not in OSZTALYOK:
+        OSZTALYOK.append(d.osztaly)
 
 
 # app
@@ -278,8 +283,56 @@ class KretaApp(App):
                 classes="overflow",
             ),
             Vertical(
-                Label("", id="tanarJegyekLabel", classes="label"),
-                Label("", id="tanarJegyek"),
+                Label(
+                    "Új jegy feljegyzése\n\nOsztály:",
+                    id="tanarJegyekLabel",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in OSZTALYOK),
+                    id="tanarJegyekSelectOsztaly",
+                    allow_blank=False,
+                    value="10B",
+                ),
+                Label("Diákok:", classes="label"),
+                Vertical(
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                    Checkbox("", classes="tanarJegyekCheckbox"),
+                ),
+                Label("Tantárgy:", classes="label"),
+                Select(
+                    ((line, line) for line in TARGYAK),
+                    id="tanarJegyekSelect",
+                    allow_blank=False,
+                    value="Történelem",
+                ),
                 id="tanarJegyekView",
                 classes="overflow",
             ),
@@ -471,6 +524,19 @@ class KretaApp(App):
                 self.query_one("#targyak").update(
                     f"Bukásra álló diákok: {Tanarok_bukoosztalyai(t.nev)}"
                 )
+                for a in self.query(".tanarJegyekCheckbox"):
+                    a.display = False
+
+                osztalyDiakjai = []
+                osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
+                for x in diakok:
+                    if x.osztaly == osztaly:
+                        osztalyDiakjai.append(x.nev)
+
+                for g, e in enumerate(osztalyDiakjai):
+                    a = self.query(".tanarJegyekCheckbox")[0 : len(osztalyDiakjai)][g]
+                    a.label = e
+                    a.display = True
 
     # handle email, password change
     @on(Input.Changed, "#email")
@@ -499,6 +565,21 @@ class KretaApp(App):
                 atlag = atlag / len(d.jegyek[event.value])
                 self.query_one("#diakJegyek").display = True
                 self.query_one("#diakJegyek").update(f"{string}\n\nÁtlag: {atlag:.2f}")
+
+    @on(Select.Changed, "#tanarJegyekSelectOsztaly")
+    def tanarJegyekSelect_changed(self, event: Select.Changed) -> None:
+        for a in self.query(".tanarJegyekCheckbox"):
+            a.display = False
+        osztalyDiakjai = []
+        osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
+        for x in diakok:
+            if x.osztaly == osztaly:
+                osztalyDiakjai.append(x.nev)
+
+        for g, e in enumerate(osztalyDiakjai):
+            a = self.query(".tanarJegyekCheckbox")[0 : len(osztalyDiakjai)][g]
+            a.label = e
+            a.display = True
 
 
 # validate email, password
