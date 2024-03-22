@@ -35,7 +35,9 @@ OSZTALYOK.sort()
 class KretaApp(App):
 
     CSS = """
-
+    Screen {
+        background: rgba(0, 128, 255, 0.1);
+    }
     Input.-valid {
         border: tall $success 60%;
     }
@@ -43,8 +45,11 @@ class KretaApp(App):
         border: tall $success;
     }
     Input {
-        width: 30%;
+        width: 60%;
         margin-bottom: 2;
+    }
+    #tanarHazikInputHatar {
+        width: 17%;
     }
     .centerCont {
         align: center middle;
@@ -70,10 +75,10 @@ class KretaApp(App):
     #diakJegyek {
         margin-top: 2;
         margin-left: 6;
-        background: blue 15%;
+        background: green 15%;
         color: auto;
         padding: 1 3;
-        border: round blue;
+        border: round green;
     }
     #diakJegyekSelect, #tanarHazikSelect {
         width: 35%;
@@ -124,6 +129,13 @@ class KretaApp(App):
     .btns, #loginScreen {
         border: round white;
     }
+    #loginInputs {
+        border: round white;
+        margin-left: 50;
+        margin-right: 50;
+        margin-top: 10;
+        margin-bottom: 10;
+    }
     .success {
         color: green;
     }
@@ -163,21 +175,26 @@ class KretaApp(App):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Center(
-            Vertical(Label("Üdvözöljük!"), classes="centerCont"),
             Vertical(
-                Input(placeholder="Email", validators=[Function(bad_e)], id="email"),
-                Input(
-                    placeholder="Jelszó",
-                    validators=[Function(bad_p)],
-                    password=True,
-                    id="password",
+                Vertical(Label("Üdvözöljük!"), classes="centerCont"),
+                Vertical(
+                    Input(
+                        placeholder="Email", validators=[Function(bad_e)], id="email"
+                    ),
+                    Input(
+                        placeholder="Jelszó",
+                        validators=[Function(bad_p)],
+                        password=True,
+                        id="password",
+                    ),
+                    classes="centerCont",
                 ),
-                classes="centerCont",
-            ),
-            Horizontal(
-                Button(label="Bejelentkezés", id="loginBtn", classes="btn"),
-                Button(label="Reset", id="resetBtn", classes="btn"),
-                classes="centerCont",
+                Horizontal(
+                    Button(label="Bejelentkezés", id="loginBtn", classes="btn"),
+                    Button(label="Reset", id="resetBtn", classes="btn"),
+                    classes="centerCont",
+                ),
+                id="loginInputs",
             ),
             id="loginScreen",
         )
@@ -474,7 +491,7 @@ class KretaApp(App):
 
     @on(Button.Pressed, "#tanarHazikBtnReset")
     def tanarHazikFeljegyzesReset(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarHazikInputOsztaly").value = ""
+        self.query_one("#tanarHazikInputOsztaly").value = "10B"
         self.query_one("#tanarHazikSelect").value = "Történelem"
         self.query_one("#tanarHazikInputHatar").value = ""
         self.query_one("#tanarHazikArea").text = ""
