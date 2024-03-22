@@ -38,13 +38,38 @@ class Diak:
         for a in self.jegyek.keys():
             if a == targy:
                 self.jegyek[targy].append(int(jegy))
-        f = open("csv/jegyek.csv", "w+", encoding="utf-8")
+        f = open("csv/jegyek.csv", "r", encoding="utf-8")
         lines = f.readlines()
+        f.close()
+        f = open("csv/jegyek.csv", "w", encoding="utf-8")
+
         for line in lines:
             line = line.strip()
             splitted = line.split(";")
             if splitted[0] == self.nev:
-                pass
+                line = ""
+                for e, y in enumerate(self.jegyek.keys()):
+                    if y == targy:
+                        if splitted[e + 1] != "0":
+                            splitted[e + 1] += f",{jegy}"
+
+                            for k, s in enumerate(splitted):
+                                if k != 0:
+                                    line += f";{s}"
+                                else:
+                                    line += s
+                        else:
+                            splitted[e + 1] = jegy
+
+                            for k, s in enumerate(splitted):
+                                if k != 0:
+                                    line += f";{s}"
+                                else:
+                                    line += s
+                            if 0 in self.jegyek[targy]:
+                                self.jegyek[targy].pop(0)
+            f.write(f"{line}\n")
+        self.tan_atlag = self.tanAtlag()
         f.close()
 
     def tanAtlag(self):
