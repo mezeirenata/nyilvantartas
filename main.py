@@ -22,6 +22,7 @@ from tanar import *
 from opciok import *
 from hazik import *
 from hianyzasok import *
+from figyelmeztetesek import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
@@ -35,6 +36,8 @@ IDOTARTAMOK = []
 for i in range(10):
     if i != 0:
         IDOTARTAMOK.append(f"{str(i*5)} perc")
+TIPUSOK = ["Szaktanári", "Osztályfőnöki", "Igazgatói"]
+FOKOZATOK = ["Figyelmeztetés", "Intő", "Megrovás"]
 
 
 # app
@@ -54,7 +57,7 @@ class KretaApp(App):
         width: 60%;
         margin-bottom: 2;
     }
-    #tanarHazikInputHatar, #tanarHianyzasokDiaknev, #tanarHianyzasokDatumInput, #tanarHianyzasokIdotartamSelect {
+    #tanarHazikInputHatar, #tanarHianyzasokDiaknev, #tanarHianyzasokDatumInput, #tanarHianyzasokIdotartamSelect, #tanarFigyelmDiaknev, #tanarFigyelmTipusSelect, #tanarFigyelmFokSelect, #tanarFigyelmInputDatum {
         width: 20%;
     }
     .centerCont {
@@ -62,7 +65,8 @@ class KretaApp(App):
     }
     .btn {
         text-style: none;
-        margin: 3;
+        margin: 1;
+        margin-left: 3;
         border: round white;
         background: rgba(0,0,0,0);
     }
@@ -105,7 +109,7 @@ class KretaApp(App):
     .btn:hover {
         background: rgba(0,0,0,0.4);
     }
-    #tanarHazikArea {
+    #tanarHazikArea, #tanarFigyelmArea {
         width: 50%;
         height: 10;
         margin-left: 3;
@@ -148,7 +152,7 @@ class KretaApp(App):
     .fail {
         color: red;
     }
-    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel, #tanarHianyzasokSuccessLabel {
+    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel, #tanarFigyelmSuccessLabel, #tanarHianyzasokSuccessLabel {
         margin-top: 1;
         margin-left: 3;
     }
@@ -210,11 +214,9 @@ class KretaApp(App):
             Vertical(
                 Button("Kijelentkezés", id="logoutBtn", classes="btn"),
                 Label("", classes="loginLabel", id="diakLoginLabel"),
-                Horizontal(
-                    Button("Órarend", id="diakOrarendBtn", classes="btn"),
-                    Button("Jegyek", id="diakJegyekBtn", classes="btn"),
-                    Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
-                ),
+                Button("Órarend", id="diakOrarendBtn", classes="btn"),
+                Button("Jegyek", id="diakJegyekBtn", classes="btn"),
+                Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
                 classes="btns screen",
             ),
             Vertical(
@@ -309,11 +311,10 @@ class KretaApp(App):
             Vertical(
                 Button("Kijelentkezés", id="logoutBtn", classes="btn"),
                 Label("", classes="loginLabel", id="tanarLoginLabel"),
-                Horizontal(
-                    Button("Új házi feladat", id="tanarHaziBtn", classes="btn"),
-                    Button("Új érdemjegy", id="tanarJegyekBtn", classes="btn"),
-                    Button("Új hiányzás", id="tanarHianyzasBtn", classes="btn"),
-                ),
+                Button("Új házi feladat", id="tanarHaziBtn", classes="btn"),
+                Button("Új érdemjegy", id="tanarJegyekBtn", classes="btn"),
+                Button("Új hiányzás", id="tanarHianyzasBtn", classes="btn"),
+                Button("Új figyelmeztetés", id="tanarFigyelmBtn", classes="btn"),
                 Pretty("", id="targyak"),
                 classes="btns screen",
             ),
@@ -354,6 +355,61 @@ class KretaApp(App):
                 ),
                 Label("", id="tanarHianyzasokSuccessLabel", classes="label"),
                 id="tanarHianyzasView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label(
+                    "Új figyelmeztetés feljegyzése\n\n\nDiák neve:",
+                    id="tanarFigyelmLabel",
+                    classes="label",
+                ),
+                Input(
+                    placeholder="Példa Béla",
+                    validators=[Function(bad_nev)],
+                    id="tanarFigyelmDiaknev",
+                    classes="label",
+                ),
+                Label(
+                    "Típus:",
+                    id="tanarFigyelmTipus",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in TIPUSOK),
+                    allow_blank=False,
+                    value="Szaktanári",
+                    id="tanarFigyelmTipusSelect",
+                    classes="label",
+                ),
+                Label(
+                    "Fokozat:",
+                    id="tanarFigyelmFok",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in FOKOZATOK),
+                    allow_blank=False,
+                    value="Figyelmeztetés",
+                    id="tanarFigyelmFokSelect",
+                    classes="label",
+                ),
+                Label("Dátum:", classes="label"),
+                Input(
+                    placeholder="YYYY.MM.DD.",
+                    validators=[Function(date)],
+                    id="tanarFigyelmInputDatum",
+                    classes="label",
+                    max_length=11,
+                ),
+                Label("Megjegyzés: ", id="tanarFigyelmMegjegy", classes="label"),
+                TextArea(
+                    id="tanarFigyelmArea", soft_wrap=True, show_line_numbers=False
+                ),
+                Button(
+                    "Feljegyzés", id="tanarFigyelmFeljegyzesBtn", classes="btn label"
+                ),
+                Label("", id="tanarFigyelmSuccessLabel", classes="label"),
+                id="tanarFigyelmView",
                 classes="overflow",
             ),
             Vertical(
@@ -452,6 +508,7 @@ class KretaApp(App):
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarFigyelmView").display = False
 
         self.title = "Kréta 2.0"
 
@@ -495,6 +552,7 @@ class KretaApp(App):
     def tanarJegyek(self, event: Button.Pressed) -> None:
         self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarFigyelmView").display = False
         self.query_one("#tanarJegyekView").display = True
         self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
 
@@ -502,13 +560,23 @@ class KretaApp(App):
     def tanarHianyzasok(self, event: Button.Pressed) -> None:
         self.query_one("#tanarHianyzasView").display = True
         self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarFigyelmView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHianyzasokSuccessLabel").display = False
+
+    @on(Button.Pressed, "#tanarFigyelmBtn")
+    def tanarFigyelm(self, event: Button.Pressed) -> None:
+        self.query_one("#tanarHianyzasView").display = False
+        self.query_one("#tanarFigyelmView").display = True
+        self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarFigyelmSuccessLabel").display = False
 
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
         self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = True
+        self.query_one("#tanarFigyelmView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHazikSuccessLabel").display = False
 
@@ -523,6 +591,25 @@ class KretaApp(App):
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
             f.write(f"{osztaly}\n{targy}\n{hatar}\n{feladat}\nEND\n")
+            f.close()
+            label.update("Sikeres feljegyzés!")
+            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nTöltsön ki minden mezőt!")
+            label.classes = "fail"
+
+    @on(Button.Pressed, "#tanarFigyelmFeljegyzesBtn")
+    def tanarFigyelmFeljegyzes(self, event: Button.Pressed) -> None:
+        nev = self.query_one("#tanarFigyelmDiaknev").value
+        tipus = self.query_one("#tanarFigyelmTipusSelect").value
+        fokozat = self.query_one("#tanarFigyelmFokSelect").value
+        datum = self.query_one("#tanarFigyelmInputDatum").value
+        megjegyzes = self.query_one("#tanarFigyelmArea").text
+        label = self.query_one("#tanarFigyelmSuccessLabel")
+        label.display = True
+        if (nev != "") and (datum != ""):
+            f = open("csv/figyelmeztetesek.csv", "a", encoding="utf-8")
+            f.write(f"{nev}\n{tipus}\n{fokozat}\n{datum}\n{megjegyzes}\nEND\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
@@ -620,7 +707,7 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                text = "\nÚj házi feladat feljegyzése\n\n\nOsztály ("
+                text = "Új házi feladat feljegyzése\n\n\nOsztály ("
                 for i, a in enumerate(t.osztalyok):
                     if i != 0:
                         text += f", {a}"
