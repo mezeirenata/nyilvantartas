@@ -148,7 +148,7 @@ class KretaApp(App):
     .fail {
         color: red;
     }
-    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel {
+    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel, #tanarHianyzasokSuccessLabel {
         margin-top: 1;
         margin-left: 3;
     }
@@ -349,6 +349,10 @@ class KretaApp(App):
                     classes="label",
                     max_length=11,
                 ),
+                Button(
+                    "Feljegyzés", id="tanarHianyzasokFeljegyzesBtn", classes="btn label"
+                ),
+                Label("", id="tanarHianyzasokSuccessLabel", classes="label"),
                 id="tanarHianyzasView",
                 classes="overflow",
             ),
@@ -499,6 +503,7 @@ class KretaApp(App):
         self.query_one("#tanarHianyzasView").display = True
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarHianyzasokSuccessLabel").display = False
 
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
@@ -518,6 +523,23 @@ class KretaApp(App):
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
             f.write(f"{osztaly}\n{targy}\n{hatar}\n{feladat}\nEND\n")
+            f.close()
+            label.update("Sikeres feljegyzés!")
+            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nTöltsön ki minden mezőt!")
+            label.classes = "fail"
+
+    @on(Button.Pressed, "#tanarHianyzasokFeljegyzesBtn")
+    def tanarHianyzasFeljegyzes(self, event: Button.Pressed) -> None:
+        label = self.query_one("#tanarHianyzasokSuccessLabel")
+        nev = self.query_one("#tanarHianyzasokDiaknev").value
+        datum = self.query_one("#tanarHianyzasokDatumInput").value
+        idotartam = self.query_one("#tanarHianyzasokIdotartamSelect").value
+        label.display = True
+        if (datum != "") and (nev != ""):
+            f = open("csv/hianyzasok.csv", "a", encoding="utf-8")
+            f.write(f"{nev};{idotartam};{datum};False\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
