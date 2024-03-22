@@ -13,22 +13,31 @@ from textual.widgets import (
     DataTable,
     Pretty,
     TextArea,
+    Collapsible,
+    Checkbox,
 )
 from textual.containers import Horizontal, Center, Vertical
 from diak import *
 from tanar import *
 from opciok import *
-
+from hazik import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
+OSZTALYOK = []
+for d in diakok:
+    if d.osztaly not in OSZTALYOK:
+        OSZTALYOK.append(d.osztaly)
+OSZTALYOK.sort()
 
 
 # app
 class KretaApp(App):
 
     CSS = """
-
+    Screen {
+        background: rgba(0, 128, 255, 0.1);
+    }
     Input.-valid {
         border: tall $success 60%;
     }
@@ -36,8 +45,11 @@ class KretaApp(App):
         border: tall $success;
     }
     Input {
-        width: 30%;
+        width: 60%;
         margin-bottom: 2;
+    }
+    #tanarHazikInputHatar {
+        width: 17%;
     }
     .centerCont {
         align: center middle;
@@ -45,23 +57,28 @@ class KretaApp(App):
     .btn {
         text-style: none;
         margin: 3;
+        border: round white;
+        background: rgba(0,0,0,0);
     }
     .loginLabel {
         margin: 2 3;
         color: auto;
-        background: white 25%;
+        background: white 10%;
         padding: 1;
+        border: round white;
     }
     .label {
         margin-left: 3;
+        margin-top: 1;
         margin-bottom: 1;
     }
     #diakJegyek {
         margin-top: 2;
         margin-left: 6;
-        background: blue 30%;
+        background: green 15%;
         color: auto;
         padding: 1 3;
+        border: round green;
     }
     #diakJegyekSelect, #tanarHazikSelect {
         width: 35%;
@@ -69,8 +86,18 @@ class KretaApp(App):
         margin-bottom: 1;
     }
     #logoutBtn {
-        background: red 60%;
+        background: red 30%;
+        border: round red;
         color: auto;
+    }
+    Collapsible {
+        border: round white;
+    }
+    #logoutBtn:hover {
+        background: red 20%;
+    }
+    .btn:hover {
+        background: rgba(0,0,0,0.4);
     }
     #tanarHazikArea {
         width: 50%;
@@ -80,7 +107,7 @@ class KretaApp(App):
     #tanarHaziView {
         overflow: auto;
     }
-    #tanarHazikInputOsztaly {
+    #tanarHazikInputOsztaly, #tanarJegyekSelectOsztaly, #tanarErdemjegySelect {
         width: 15;
     }
     * {
@@ -94,7 +121,7 @@ class KretaApp(App):
         margin-top: 1;
         margin-left: 3;
         border: round blue;
-        width: 64%;
+        width: 63%;
     }
     #diakHazik {
         margin-left: 3;
@@ -102,15 +129,39 @@ class KretaApp(App):
     .btns, #loginScreen {
         border: round white;
     }
+    #loginInputs {
+        border: round white;
+        margin-left: 50;
+        margin-right: 50;
+        margin-top: 10;
+        margin-bottom: 10;
+    }
     .success {
         color: green;
     }
     .fail {
         color: red;
     }
-    #tanarHazikSuccessLabel {
+    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel {
         margin-top: 1;
         margin-left: 3;
+    }
+    .hazik {
+        margin-left: 4;
+        margin-top: 1;
+        width: 50%;
+    }
+    .screen {
+        width: 35%;
+    }
+    Checkbox {
+        width: 50;
+        border: round white;
+        margin-left: 3;
+        background: rgba(0,0,0,0);
+    }
+    Select {
+        width: 40%;
     }
     """
 
@@ -124,21 +175,26 @@ class KretaApp(App):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Center(
-            Vertical(Label("Üdvözöljük!"), classes="centerCont"),
             Vertical(
-                Input(placeholder="Email", validators=[Function(bad_e)], id="email"),
-                Input(
-                    placeholder="Jelszó",
-                    validators=[Function(bad_p)],
-                    password=True,
-                    id="password",
+                Vertical(Label("Üdvözöljük!"), classes="centerCont"),
+                Vertical(
+                    Input(
+                        placeholder="Email", validators=[Function(bad_e)], id="email"
+                    ),
+                    Input(
+                        placeholder="Jelszó",
+                        validators=[Function(bad_p)],
+                        password=True,
+                        id="password",
+                    ),
+                    classes="centerCont",
                 ),
-                classes="centerCont",
-            ),
-            Horizontal(
-                Button(label="Bejelentkezés", id="loginBtn", classes="btn"),
-                Button(label="Reset", id="resetBtn", classes="btn"),
-                classes="centerCont",
+                Horizontal(
+                    Button(label="Bejelentkezés", id="loginBtn", classes="btn"),
+                    Button(label="Reset", id="resetBtn", classes="btn"),
+                    classes="centerCont",
+                ),
+                id="loginInputs",
             ),
             id="loginScreen",
         )
@@ -153,7 +209,7 @@ class KretaApp(App):
                     Button("Jegyek", id="diakJegyekBtn", classes="btn"),
                     Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
                 ),
-                classes="btns",
+                classes="btns screen",
             ),
             Vertical(
                 Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
@@ -175,12 +231,73 @@ class KretaApp(App):
             ),
             Vertical(
                 Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
-                Label("Nincsenek rögzített házi feladatok.", id="diakHazik"),
+                Label("", id="diakHazik"),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
+                Collapsible(
+                    Label("", classes="hazikContent"),
+                    collapsed=True,
+                    title="",
+                    classes="hazik",
+                ),
                 id="diakHaziView",
                 classes="overflow",
             ),
             id="diakScreen",
         )
+
         # tanár nézet
         yield Horizontal(
             Vertical(
@@ -191,7 +308,7 @@ class KretaApp(App):
                     Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
                 ),
                 Pretty("", id="targyak"),
-                classes="btns",
+                classes="btns screen",
             ),
             Vertical(
                 Label("Órarend", id="tanarOrarendLabel", classes="label"),
@@ -200,17 +317,60 @@ class KretaApp(App):
                 classes="overflow",
             ),
             Vertical(
-                Label("", id="tanarJegyekLabel", classes="label"),
-                Label("", id="tanarJegyek"),
+                Label(
+                    "Új jegy feljegyzése\n\n\nOsztály:",
+                    id="tanarJegyekLabel",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in OSZTALYOK),
+                    id="tanarJegyekSelectOsztaly",
+                    allow_blank=False,
+                    value="10B",
+                    classes="label",
+                ),
+                Label("Diákok:", classes="label"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Checkbox("", classes="tanarJegyekCheckbox"),
+                Label("Tantárgy:", classes="label"),
+                Select(
+                    ((line, line) for line in TARGYAK),
+                    id="tanarJegyekSelect",
+                    allow_blank=False,
+                    value="Történelem",
+                    classes="label",
+                ),
+                Label("Érdemjegy:", classes="label"),
+                Select(
+                    ((line, line) for line in ["5", "4", "3", "2", "1"]),
+                    id="tanarErdemjegySelect",
+                    allow_blank=False,
+                    value="5",
+                    classes="label",
+                ),
+                Button("Feljegyzés", classes="label btn", id="tanarJegyFeljegyzesBtn"),
+                Label("", id="tanarJegyFeljegyzesSuccessLabel", classes="label"),
                 id="tanarJegyekView",
                 classes="overflow",
             ),
             Vertical(
                 Label("", id="tanarHazikLabel", classes="label"),
-                Input(
-                    placeholder="Osztály",
-                    validators=[Function(bad_class)],
+                Select(
+                    ((line, line) for line in OSZTALYOK),
                     id="tanarHazikInputOsztaly",
+                    allow_blank=False,
+                    value="10B",
                     classes="label",
                 ),
                 Label("Tantárgy:", classes="label"),
@@ -222,11 +382,11 @@ class KretaApp(App):
                 ),
                 Label("Határidő:", classes="label"),
                 Input(
-                    placeholder="YYYY.HH.NN",
+                    placeholder="YYYY.MM.DD.",
                     validators=[Function(date)],
                     id="tanarHazikInputHatar",
                     classes="label",
-                    max_length=10,
+                    max_length=11,
                 ),
                 Label("Feladat:", classes="label"),
                 TextArea(id="tanarHazikArea", soft_wrap=True, show_line_numbers=False),
@@ -252,6 +412,7 @@ class KretaApp(App):
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarJegyekView").display = False
+
         self.title = "Kréta 2.0"
 
     # handle button presses
@@ -277,12 +438,6 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = True
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = False
-        for d in diakok:
-            if d.email == email:
-                table: DataTable = self.query_one("#diakOrarend")
-                table.clear(True)
-                table.add_columns(*d.orarend[0])
-                table.add_rows(d.orarend[1:])
 
     @on(Button.Pressed, "#diakJegyekBtn")
     def diakJegyek(self, event: Button.Pressed) -> None:
@@ -307,6 +462,7 @@ class KretaApp(App):
         self.query_one("#tanarOrarendView").display = False
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarJegyekView").display = True
+        self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
 
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
@@ -325,7 +481,7 @@ class KretaApp(App):
         label.display = True
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
-            f.write(f"\n---\n{osztaly};{targy};{hatar}\n{feladat}\n---")
+            f.write(f"{osztaly}\n{targy}\n{hatar}\n{feladat}\nEND\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
@@ -335,28 +491,70 @@ class KretaApp(App):
 
     @on(Button.Pressed, "#tanarHazikBtnReset")
     def tanarHazikFeljegyzesReset(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarHazikInputOsztaly").value = ""
+        self.query_one("#tanarHazikInputOsztaly").value = "10B"
         self.query_one("#tanarHazikSelect").value = "Történelem"
         self.query_one("#tanarHazikInputHatar").value = ""
         self.query_one("#tanarHazikArea").text = ""
         self.query_one("#tanarHazikSuccessLabel").update("")
+
+    @on(Button.Pressed, "#tanarJegyFeljegyzesBtn")
+    def tanarJegyFeljegyzes(self, event: Button.Pressed) -> None:
+
+        label = self.query_one("#tanarJegyFeljegyzesSuccessLabel")
+        label.display = True
+        filled = False
+        for a in self.query(".tanarJegyekCheckbox"):
+            if a.value == True:
+                filled = True
+        if filled:
+            for a in self.query(".tanarJegyekCheckbox"):
+                if a.value == True:
+                    for d in diakok:
+                        if d.nev == str(a.label):
+                            targy = self.query_one("#tanarJegyekSelect").value
+                            jegy = self.query_one("#tanarErdemjegySelect").value
+                            d.addJegy(targy, jegy)
+                            label.update("Sikeres feljegyzés!")
+                            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nVálasszon ki legalább egy diákot!")
+            label.classes = "fail"
 
     @on(Button.Pressed, "#loginBtn")
     def login(self, event: Button.Pressed) -> None:
         # diák bejelentkezés
         for d in diakok:
             if d.email == email and d.jelszo == password:
-
                 self.query_one("#loginScreen").display = False
                 self.query_one("#diakScreen").display = True
 
                 self.query_one("#diakLoginLabel").update(
-                    f"Bejelentkezve: {d.nev} (diák)\nJelenlegi ösztöndíj: {d.osztondij}"
+                    f"Bejelentkezve: {d.nev} (diák)\nOsztály: {d.osztaly}\n\nJelenlegi ösztöndíj: {d.osztondij}"
                 )
                 self.query_one("#diakJegyekLabel").update(
                     f"\nJegyek\n\nTanulmányi átlag: {d.tan_atlag:.2f}"
                 )
                 self.query_one("#diakJegyek").display = False
+                table: DataTable = self.query_one("#diakOrarend")
+                table.clear(True)
+                table.add_columns(*d.orarend[0])
+                table.add_rows(d.orarend[1:])
+
+                for a in self.query(".hazik"):
+                    a.display = False
+
+                osszesdiakhazi = readHazik(d.osztaly)
+
+                if osszesdiakhazi != None:
+                    for g, e in enumerate(osszesdiakhazi):
+                        a = self.query(".hazik")[g]
+                        a.title = f"{e.targy} - Határidő: {e.hatarido}"
+                        a.display = True
+                        self.query(".hazikContent")[g].update(e.feladat)
+                else:
+                    self.query_one("#diakHazik").update(
+                        "Nincsenek feljegyzett házi feladatok."
+                    )
 
         # tanár bejelentkezés
         for t in tanarok:
@@ -364,7 +562,7 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                text = "\nHázi feladatok\n\n[Új feljegyzés]\n\n\nOsztály ("
+                text = "\nÚj házi feladat feljegyzése\n\n\nOsztály ("
                 for i, a in enumerate(t.osztalyok):
                     if i != 0:
                         text += f", {a}"
@@ -379,8 +577,21 @@ class KretaApp(App):
                 self.query_one("#targyak").update(
                     f"Bukásra álló diákok: {Tanarok_bukoosztalyai(t.nev)}"
                 )
+                for a in self.query(".tanarJegyekCheckbox"):
+                    a.display = False
+                    a.value = False
+                osztalyDiakjai = []
+                osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
+                for x in diakok:
+                    if x.osztaly == osztaly:
+                        osztalyDiakjai.append(x.nev)
 
-    # handle email, password change
+                for g, e in enumerate(osztalyDiakjai):
+                    a = self.query(".tanarJegyekCheckbox")[g]
+                    a.label = e
+                    a.display = True
+
+    # handle change
     @on(Input.Changed, "#email")
     def changeEmail(self, event: Input.Changed):
         global email
@@ -408,6 +619,23 @@ class KretaApp(App):
                 self.query_one("#diakJegyek").display = True
                 self.query_one("#diakJegyek").update(f"{string}\n\nÁtlag: {atlag:.2f}")
 
+    @on(Select.Changed, "#tanarJegyekSelectOsztaly")
+    def tanarJegyekSelect_changed(self, event: Select.Changed) -> None:
+        self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
+        for a in self.query(".tanarJegyekCheckbox"):
+            a.display = False
+            a.value = False
+        osztalyDiakjai = []
+        osztaly = self.query_one("#tanarJegyekSelectOsztaly").value
+        for x in diakok:
+            if x.osztaly == osztaly:
+                osztalyDiakjai.append(x.nev)
+
+        for g, e in enumerate(osztalyDiakjai):
+            a = self.query(".tanarJegyekCheckbox")[g]
+            a.label = e
+            a.display = True
+
 
 # validate email, password
 def bad_e(value: str) -> bool:
@@ -434,24 +662,15 @@ def bad_p(value: str) -> bool:
         return False
 
 
-def bad_class(value: str) -> bool:
-    try:
-        for d in diakok:
-            if d.osztaly == value:
-                return True
-    except ValueError:
-        return False
-
-
 def date(value: str) -> bool:
     try:
         splitted = value.strip().split(".")
-        if len(splitted) == 3:
+        if len(splitted) == 4:
             if (len(splitted[0]) == 4) and (splitted[0].isnumeric()):
                 if (len(splitted[1]) == 2) and (splitted[1].isnumeric()):
                     if (len(splitted[2]) == 2) and (splitted[2].isnumeric()):
-
-                        return True
+                        if splitted[3] == "":
+                            return True
     except ValueError:
         return False
 

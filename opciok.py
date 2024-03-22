@@ -136,73 +136,67 @@ def MentesHozzaadas(tanarok_file:str, jegyek_file:str,diakok_file:str) -> None:
         case '0':
             #Tanár
             tanar_nev = str(input('Pedagógus neve (Vezetéknév Keresztnév): '))
-            tanar_osztalyok = str(input('A tanító által tanított osztály(ok) (11NY, 9B): '))
-            tanar_email = str(input('A pedagógus E-mail címe:(vezeteknev.keresztnev@gmail.com): '))
+            tanar_osztalyok = str(input('A tanító által tanított osztály(ok) (pl.: 11NY,9B): '))
+            tanar_email = str(input('A pedagógus E-mail címe (pl.: vezeteknev.keresztnev@gmail.com): '))
             tanar_jelszo = str(input('Az új felhasználó belépési jelszava: '))
-            tanar_targyak = str('A tanító által tanított tantárgy(ak) :')
+            tanar_targyak = str(input('A tanító által tanított tantárgy(ak) (pl.: Történelem,Angol): '))
 
-            f = open(tanarok_file, 'w', encoding='utf-8')
+            f = open(tanarok_file, 'a', encoding='utf-8')
             f.write(f'{tanar_nev};{tanar_osztalyok};{tanar_email};{tanar_jelszo};{tanar_targyak}\n')
             f.close()
-            f = open(tanarok_file,'r',encoding='utf-8')
-            tanarok = []
-            for row in f:
-                tanarok.append(Tanar(row))
-            f.close()
+            
+            
+            tanarok.append(Tanar(f'{tanar_nev};{tanar_osztalyok};{tanar_email};{tanar_jelszo};{tanar_targyak}\n'))
+            
 
         case '1':
             #Diák
             diak_nev = str(input('Tanuló neve (Vezetéknév Keresztnév): '))
-            diak_osztaly = str(input('Tanuló osztálya (11NY): '))
-            diak_email = str(input('Tanuló E-mail címe:(vezeteknev.keresztnev@gmail.com): '))
+            diak_osztaly = str(input('Tanuló osztálya (pl.: 11NY): '))
+            diak_email = str(input('Tanuló E-mail címe (pl.: vezeteknev.keresztnev@gmail.com): '))
             diak_jelszo = str(input('Az új felhasználó belépési jelszava: '))
-            tori = str(input('Az új tanuló meglévő Történelem jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            info = str(input('Az új tanuló meglévő Informatika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            angol = str(input('Az új tanuló meglévő Angol idegennyelv jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            irod = str(input('Az új tanuló meglévő Irodalom jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            nyt = str(input('Az új tanuló meglévő Nyelvtan jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            tesi = str(input('Az új tanuló meglévő Testnevelés jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            matek = str(input('Az új tanuló meglévő Matematika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            fizika = str(input('Az új tanuló meglévő Fizika jegyei: (1,2,3,4,5..stb, jegyek:1-től 5-ig)'))
-            diak_jegyei = tori + ";" + info + ";" + angol + ";" + irod + ";" + nyt + ";" + tesi + ";" + matek + ";" + fizika
-            f = open(diakok_file, "w", encoding = 'utf-8')
+
+            
+            f = open(diakok_file, "a", encoding = 'utf-8')
             f.write(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n')
             f.close()
-
-            f = open(diakok_file, 'r', encoding='utf-8')
-            for row in f:
-                diakok = []
-                row = row + ";" + diak_jegyei
-                diakok.append(Diak(row))
+            f = open(jegyek_file, "a", encoding="utf-8")
+            f.write(f"{diak_nev};0;0;0;0;0;0;0;0")
             f.close()
+            diakok.append(Diak(f'{diak_nev};{diak_osztaly};{diak_email};{diak_jelszo}\n'))
 
-            f = open(jegyek_file, 'w', encoding = 'utf-8')
-            f.write(f'{diak_nev};{diak_jegyei}\n')
-            f.close()
 
     
-def EltavolitasTanuloDiak(eltavolitando_neve:str) -> None:
+def EltavolitasTanarDiak(eltavolitando_neve:str) -> None:
     eltavolitando = Felhasznalo_lekerese(eltavolitando_neve)
     if eltavolitando in diakok:
         diakok.remove(eltavolitando)
-        f = open("csv/diakok.csv", 'w', encoding='utf-8')
-        for row in f:
-            f.remove(row)
+        file=open("csv/diakok.csv", 'w', encoding='utf-8')
+        file.write('Név;Osztály;Email;Jelszó\n')
         for d in diakok:
-            f.write(f'{d}\n')
-        f.close()
-
-        f = open("csv/jegyek.csv", 'w', encoding='utf-8')
-        for row in f:
-            if eltavolitando.nev in row:
-                f.remove(row)
-        f.close()
+            file.write(f'{d.nev};{d.osztaly};{d.email};{d.jelszo}\n')
+        file.close()
+        
 
     elif eltavolitando in tanarok:
         tanarok.remove(eltavolitando)
-        f = open("csv/tanarok.csv", 'w', encoding='utf-8')
-        for row in f:
-            f.remove(row)
+        file=open("csv/tanarok.csv", 'w', encoding='utf-8')
+        file.write('Név;Osztályok;Email;Jelszó;Tárgyak\n')
         for t in tanarok:
-            f.write(f'{t}\n')
-        f.close()
+            file.write(f'{t.nev};{t.osztalyok[0:]};{t.email};{t.jelszo};{t.targyak[0:]}\n')
+        file.close()
+
+
+def HanyadikSor(nev:str) -> int:
+    eltavolitando = Felhasznalo_lekerese(nev)
+    sor = 0
+    if eltavolitando in diakok:
+        for item, index in enumerate(diakok):
+            if item == eltavolitando:
+                sor = index
+    elif eltavolitando in tanarok:
+        for item, index in enumerate(tanarok):
+            if item == eltavolitando:
+                sor = index
+    return sor
+

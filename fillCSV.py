@@ -218,12 +218,14 @@ def password(nameList):
 
 
 f = open("csv/hazik.csv", "w", encoding="utf-8")
-f.write("Osztály;Tárgy;Határidő;Feladat")
+f.write("Osztály;Tárgy;Határidő;Feladat\n")
 f.close()
 
 writeDiakok()
 writeJegyek()
 from diak import *
-
+from opciok import *
 writeOrarend()
 writeTanarok()
+while True:
+    MentesHozzaadas("csv/tanarok.csv", "csv/jegyek.csv", "csv/diakok.csv")

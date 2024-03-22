@@ -15,11 +15,14 @@ class Diak:
         f = open("csv/jegyek.csv", "r", encoding="utf-8")
         for i, sor in enumerate(f):
             splitted = sor.strip().split(";")
+
             if i == 0:
                 targyak = sor.strip().split(";")
                 for t in targyak:
                     if t != "Név":
                         dictionary[t] = []
+                global d
+                d = dictionary
             else:
                 if splitted[0] == self.nev:
                     for x, s in enumerate(splitted[1:]):
@@ -30,6 +33,44 @@ class Diak:
 
         f.close()
         return dictionary
+
+    def addJegy(self, targy, jegy):
+        for a in self.jegyek.keys():
+            if a == targy:
+                self.jegyek[targy].append(int(jegy))
+        f = open("csv/jegyek.csv", "r", encoding="utf-8")
+        lines = f.readlines()
+        f.close()
+        f = open("csv/jegyek.csv", "w", encoding="utf-8")
+
+        for line in lines:
+            line = line.strip()
+            splitted = line.split(";")
+            if splitted[0] == self.nev:
+                line = ""
+                for e, y in enumerate(self.jegyek.keys()):
+                    if y == targy:
+                        if splitted[e + 1] != "0":
+                            splitted[e + 1] += f",{jegy}"
+
+                            for k, s in enumerate(splitted):
+                                if k != 0:
+                                    line += f";{s}"
+                                else:
+                                    line += s
+                        else:
+                            splitted[e + 1] = jegy
+
+                            for k, s in enumerate(splitted):
+                                if k != 0:
+                                    line += f";{s}"
+                                else:
+                                    line += s
+                            if 0 in self.jegyek[targy]:
+                                self.jegyek[targy].pop(0)
+            f.write(f"{line}\n")
+        self.tan_atlag = self.tanAtlag()
+        f.close()
 
     def tanAtlag(self):
         tan_atlag = 0
