@@ -21,6 +21,7 @@ from diak import *
 from tanar import *
 from opciok import *
 from hazik import *
+from hianyzasok import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
@@ -29,6 +30,11 @@ for d in diakok:
     if d.osztaly not in OSZTALYOK:
         OSZTALYOK.append(d.osztaly)
 OSZTALYOK.sort()
+
+IDOTARTAMOK = []
+for i in range(10):
+    if i != 0:
+        IDOTARTAMOK.append(f"{str(i*5)} perc")
 
 
 # app
@@ -48,8 +54,8 @@ class KretaApp(App):
         width: 60%;
         margin-bottom: 2;
     }
-    #tanarHazikInputHatar {
-        width: 17%;
+    #tanarHazikInputHatar, #tanarHianyzasokDiaknev, #tanarHianyzasokDatumInput, #tanarHianyzasokIdotartamSelect {
+        width: 20%;
     }
     .centerCont {
         align: center middle;
@@ -304,16 +310,46 @@ class KretaApp(App):
                 Button("Kijelentkezés", id="logoutBtn", classes="btn"),
                 Label("", classes="loginLabel", id="tanarLoginLabel"),
                 Horizontal(
-                    Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
-                    Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
+                    Button("Új házi feladat", id="tanarHaziBtn", classes="btn"),
+                    Button("Új érdemjegy", id="tanarJegyekBtn", classes="btn"),
+                    Button("Új hiányzás", id="tanarHianyzasBtn", classes="btn"),
                 ),
                 Pretty("", id="targyak"),
                 classes="btns screen",
             ),
             Vertical(
-                Label("Órarend", id="tanarOrarendLabel", classes="label"),
-                DataTable(id="tanarOrarend"),
-                id="tanarOrarendView",
+                Label(
+                    "Új hiányzás feljegyzése\n\n\nDiák neve:",
+                    id="tanarHianyzasLabel",
+                    classes="label",
+                ),
+                Input(
+                    placeholder="Példa Béla",
+                    validators=[Function(bad_nev)],
+                    id="tanarHianyzasokDiaknev",
+                    classes="label",
+                ),
+                Label(
+                    "Hiányzás időtartama:",
+                    id="tanarHianyzasokIdotartam",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in IDOTARTAMOK),
+                    allow_blank=False,
+                    value="5 perc",
+                    id="tanarHianyzasokIdotartamSelect",
+                    classes="label",
+                ),
+                Label("Dátum: ", id="tanarHianyzasokDatum", classes="label"),
+                Input(
+                    placeholder="YYYY.MM.DD.",
+                    validators=[Function(date)],
+                    id="tanarHianyzasokDatumInput",
+                    classes="label",
+                    max_length=11,
+                ),
+                id="tanarHianyzasView",
                 classes="overflow",
             ),
             Vertical(
@@ -410,7 +446,7 @@ class KretaApp(App):
         self.query_one("#diakHaziView").display = False
 
         self.query_one("#tanarHaziView").display = False
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
 
         self.title = "Kréta 2.0"
@@ -429,7 +465,7 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHaziView").display = False
 
@@ -451,22 +487,22 @@ class KretaApp(App):
         self.query_one("#diakHaziView").display = True
         self.query_one("#diakJegyekView").display = False
 
-    @on(Button.Pressed, "#tanarOrarendBtn")
-    def tanarOrarend(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = True
-        self.query_one("#tanarHaziView").display = False
-        self.query_one("#tanarJegyekView").display = False
-
     @on(Button.Pressed, "#tanarJegyekBtn")
     def tanarJegyek(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarJegyekView").display = True
         self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
 
+    @on(Button.Pressed, "#tanarHianyzasBtn")
+    def tanarHianyzasok(self, event: Button.Pressed) -> None:
+        self.query_one("#tanarHianyzasView").display = True
+        self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarJegyekView").display = False
+
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = True
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHazikSuccessLabel").display = False
@@ -637,7 +673,7 @@ class KretaApp(App):
             a.display = True
 
 
-# validate email, password
+# validate input
 def bad_e(value: str) -> bool:
     try:
         for d in diakok:
@@ -645,6 +681,15 @@ def bad_e(value: str) -> bool:
                 return True
         for t in tanarok:
             if t.email == value:
+                return True
+    except ValueError:
+        return False
+
+
+def bad_nev(value: str) -> bool:
+    try:
+        for d in diakok:
+            if d.nev == value:
                 return True
     except ValueError:
         return False
