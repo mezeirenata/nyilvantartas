@@ -21,6 +21,8 @@ from diak import *
 from tanar import *
 from opciok import *
 from hazik import *
+from hianyzasok import *
+from figyelmeztetesek import *
 
 # tantárgyak listája
 TARGYAK = list(diakok[0].jegyek)
@@ -29,6 +31,13 @@ for d in diakok:
     if d.osztaly not in OSZTALYOK:
         OSZTALYOK.append(d.osztaly)
 OSZTALYOK.sort()
+
+IDOTARTAMOK = []
+for i in range(10):
+    if i != 0:
+        IDOTARTAMOK.append(f"{str(i*5)} perc")
+TIPUSOK = ["Szaktanári", "Osztályfőnöki", "Igazgatói"]
+FOKOZATOK = ["Figyelmeztetés", "Intő", "Megrovás"]
 
 
 # app
@@ -48,15 +57,16 @@ class KretaApp(App):
         width: 60%;
         margin-bottom: 2;
     }
-    #tanarHazikInputHatar {
-        width: 17%;
+    #tanarHazikInputHatar, #tanarHianyzasokDiaknev, #tanarHianyzasokDatumInput, #tanarHianyzasokIdotartamSelect, #tanarFigyelmDiaknev, #tanarFigyelmTipusSelect, #tanarFigyelmFokSelect, #tanarFigyelmInputDatum {
+        width: 20%;
     }
     .centerCont {
         align: center middle;
     }
     .btn {
         text-style: none;
-        margin: 3;
+        margin: 1;
+        margin-left: 3;
         border: round white;
         background: rgba(0,0,0,0);
     }
@@ -99,7 +109,10 @@ class KretaApp(App):
     .btn:hover {
         background: rgba(0,0,0,0.4);
     }
-    #tanarHazikArea {
+    .hazikContent, .figyelmContent {
+        height: 15;
+    }
+    #tanarHazikArea, #tanarFigyelmArea {
         width: 50%;
         height: 10;
         margin-left: 3;
@@ -123,7 +136,7 @@ class KretaApp(App):
         border: round blue;
         width: 63%;
     }
-    #diakHazik {
+    #diakHazik, #diakFigyelm {
         margin-left: 3;
     }
     .btns, #loginScreen {
@@ -142,11 +155,11 @@ class KretaApp(App):
     .fail {
         color: red;
     }
-    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel {
+    #tanarHazikSuccessLabel, #tanarJegyFeljegyzesSuccessLabel, #tanarFigyelmSuccessLabel, #tanarHianyzasokSuccessLabel {
         margin-top: 1;
         margin-left: 3;
     }
-    .hazik {
+    .hazik, .figyelm {
         margin-left: 4;
         margin-top: 1;
         width: 50%;
@@ -204,17 +217,78 @@ class KretaApp(App):
             Vertical(
                 Button("Kijelentkezés", id="logoutBtn", classes="btn"),
                 Label("", classes="loginLabel", id="diakLoginLabel"),
-                Horizontal(
-                    Button("Órarend", id="diakOrarendBtn", classes="btn"),
-                    Button("Jegyek", id="diakJegyekBtn", classes="btn"),
-                    Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
-                ),
+                Button("Órarend", id="diakOrarendBtn", classes="btn"),
+                Button("Jegyek", id="diakJegyekBtn", classes="btn"),
+                Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+                Button("Figyelmeztetések", id="diakFigyelmBtn", classes="btn"),
                 classes="btns screen",
             ),
             Vertical(
                 Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
                 DataTable(id="diakOrarend", zebra_stripes=True),
                 id="diakOrarendView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("\nFigyelmeztetések", id="diakFigyelmLabel", classes="label"),
+                Label("", id="diakFigyelm"),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                id="diakFigyelmView",
                 classes="overflow",
             ),
             Vertical(
@@ -233,61 +307,81 @@ class KretaApp(App):
                 Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
                 Label("", id="diakHazik"),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
@@ -303,17 +397,105 @@ class KretaApp(App):
             Vertical(
                 Button("Kijelentkezés", id="logoutBtn", classes="btn"),
                 Label("", classes="loginLabel", id="tanarLoginLabel"),
-                Horizontal(
-                    Button("Házi feladatok", id="tanarHaziBtn", classes="btn"),
-                    Button("Jegyek", id="tanarJegyekBtn", classes="btn"),
-                ),
+                Button("Új házi feladat", id="tanarHaziBtn", classes="btn"),
+                Button("Új érdemjegy", id="tanarJegyekBtn", classes="btn"),
+                Button("Új hiányzás", id="tanarHianyzasBtn", classes="btn"),
+                Button("Új figyelmeztetés", id="tanarFigyelmBtn", classes="btn"),
                 Pretty("", id="targyak"),
                 classes="btns screen",
             ),
             Vertical(
-                Label("Órarend", id="tanarOrarendLabel", classes="label"),
-                DataTable(id="tanarOrarend"),
-                id="tanarOrarendView",
+                Label(
+                    "Új hiányzás feljegyzése\n\n\nDiák neve:",
+                    id="tanarHianyzasLabel",
+                    classes="label",
+                ),
+                Input(
+                    placeholder="Példa Béla",
+                    validators=[Function(bad_nev)],
+                    id="tanarHianyzasokDiaknev",
+                    classes="label",
+                ),
+                Label(
+                    "Hiányzás időtartama:",
+                    id="tanarHianyzasokIdotartam",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in IDOTARTAMOK),
+                    allow_blank=False,
+                    value="5 perc",
+                    id="tanarHianyzasokIdotartamSelect",
+                    classes="label",
+                ),
+                Label("Dátum: ", id="tanarHianyzasokDatum", classes="label"),
+                Input(
+                    placeholder="YYYY.MM.DD.",
+                    validators=[Function(date)],
+                    id="tanarHianyzasokDatumInput",
+                    classes="label",
+                    max_length=11,
+                ),
+                Button(
+                    "Feljegyzés", id="tanarHianyzasokFeljegyzesBtn", classes="btn label"
+                ),
+                Label("", id="tanarHianyzasokSuccessLabel", classes="label"),
+                id="tanarHianyzasView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label(
+                    "Új figyelmeztetés feljegyzése\n\n\nDiák neve:",
+                    id="tanarFigyelmLabel",
+                    classes="label",
+                ),
+                Input(
+                    placeholder="Példa Béla",
+                    validators=[Function(bad_nev)],
+                    id="tanarFigyelmDiaknev",
+                    classes="label",
+                ),
+                Label(
+                    "Típus:",
+                    id="tanarFigyelmTipus",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in TIPUSOK),
+                    allow_blank=False,
+                    value="Szaktanári",
+                    id="tanarFigyelmTipusSelect",
+                    classes="label",
+                ),
+                Label(
+                    "Fokozat:",
+                    id="tanarFigyelmFok",
+                    classes="label",
+                ),
+                Select(
+                    ((line, line) for line in FOKOZATOK),
+                    allow_blank=False,
+                    value="Figyelmeztetés",
+                    id="tanarFigyelmFokSelect",
+                    classes="label",
+                ),
+                Label("Dátum:", classes="label"),
+                Input(
+                    placeholder="YYYY.MM.DD.",
+                    validators=[Function(date)],
+                    id="tanarFigyelmInputDatum",
+                    classes="label",
+                    max_length=11,
+                ),
+                Label("Megjegyzés: ", id="tanarFigyelmMegjegy", classes="label"),
+                TextArea(
+                    id="tanarFigyelmArea", soft_wrap=True, show_line_numbers=False
+                ),
+                Button(
+                    "Feljegyzés", id="tanarFigyelmFeljegyzesBtn", classes="btn label"
+                ),
+                Label("", id="tanarFigyelmSuccessLabel", classes="label"),
+                id="tanarFigyelmView",
                 classes="overflow",
             ),
             Vertical(
@@ -408,10 +590,12 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakFigyelmView").display = False
 
         self.query_one("#tanarHaziView").display = False
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarFigyelmView").display = False
 
         self.title = "Kréta 2.0"
 
@@ -429,7 +613,8 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#diakFigyelmView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHaziView").display = False
 
@@ -437,37 +622,59 @@ class KretaApp(App):
     def diaOrarend(self, event: Button.Pressed) -> None:
         self.query_one("#diakOrarendView").display = True
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakJegyekView").display = False
 
     @on(Button.Pressed, "#diakJegyekBtn")
     def diakJegyek(self, event: Button.Pressed) -> None:
         self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = True
 
     @on(Button.Pressed, "#diakHaziBtn")
     def diakHazik(self, event: Button.Pressed) -> None:
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakHaziView").display = True
         self.query_one("#diakJegyekView").display = False
 
-    @on(Button.Pressed, "#tanarOrarendBtn")
-    def tanarOrarend(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = True
-        self.query_one("#tanarHaziView").display = False
-        self.query_one("#tanarJegyekView").display = False
+    @on(Button.Pressed, "#diakFigyelmBtn")
+    def diakFigyelm(self, event: Button.Pressed) -> None:
+        self.query_one("#diakFigyelmView").display = True
+        self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakHaziView").display = False
+        self.query_one("#diakJegyekView").display = False
 
     @on(Button.Pressed, "#tanarJegyekBtn")
     def tanarJegyek(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarFigyelmView").display = False
         self.query_one("#tanarJegyekView").display = True
         self.query_one("#tanarJegyFeljegyzesSuccessLabel").display = False
 
+    @on(Button.Pressed, "#tanarHianyzasBtn")
+    def tanarHianyzasok(self, event: Button.Pressed) -> None:
+        self.query_one("#tanarHianyzasView").display = True
+        self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarFigyelmView").display = False
+        self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarHianyzasokSuccessLabel").display = False
+
+    @on(Button.Pressed, "#tanarFigyelmBtn")
+    def tanarFigyelm(self, event: Button.Pressed) -> None:
+        self.query_one("#tanarHianyzasView").display = False
+        self.query_one("#tanarFigyelmView").display = True
+        self.query_one("#tanarHaziView").display = False
+        self.query_one("#tanarJegyekView").display = False
+        self.query_one("#tanarFigyelmSuccessLabel").display = False
+
     @on(Button.Pressed, "#tanarHaziBtn")
     def tanarHazik(self, event: Button.Pressed) -> None:
-        self.query_one("#tanarOrarendView").display = False
+        self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarHaziView").display = True
+        self.query_one("#tanarFigyelmView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHazikSuccessLabel").display = False
 
@@ -482,6 +689,42 @@ class KretaApp(App):
         if (osztaly != "") and (targy != "") and (hatar != "") and (feladat != ""):
             f = open("csv/hazik.csv", "a", encoding="utf-8")
             f.write(f"{osztaly}\n{targy}\n{hatar}\n{feladat}\nEND\n")
+            f.close()
+            label.update("Sikeres feljegyzés!")
+            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nTöltsön ki minden mezőt!")
+            label.classes = "fail"
+
+    @on(Button.Pressed, "#tanarFigyelmFeljegyzesBtn")
+    def tanarFigyelmFeljegyzes(self, event: Button.Pressed) -> None:
+        nev = self.query_one("#tanarFigyelmDiaknev").value
+        tipus = self.query_one("#tanarFigyelmTipusSelect").value
+        fokozat = self.query_one("#tanarFigyelmFokSelect").value
+        datum = self.query_one("#tanarFigyelmInputDatum").value
+        megjegyzes = self.query_one("#tanarFigyelmArea").text
+        label = self.query_one("#tanarFigyelmSuccessLabel")
+        label.display = True
+        if (nev != "") and (datum != ""):
+            f = open("csv/figyelmeztetesek.csv", "a", encoding="utf-8")
+            f.write(f"{nev}\n{tipus}\n{fokozat}\n{datum}\n{megjegyzes}\nEND\n")
+            f.close()
+            label.update("Sikeres feljegyzés!")
+            label.classes = "success"
+        else:
+            label.update("Sikertelen feljegyzés!\nTöltsön ki minden mezőt!")
+            label.classes = "fail"
+
+    @on(Button.Pressed, "#tanarHianyzasokFeljegyzesBtn")
+    def tanarHianyzasFeljegyzes(self, event: Button.Pressed) -> None:
+        label = self.query_one("#tanarHianyzasokSuccessLabel")
+        nev = self.query_one("#tanarHianyzasokDiaknev").value
+        datum = self.query_one("#tanarHianyzasokDatumInput").value
+        idotartam = self.query_one("#tanarHianyzasokIdotartamSelect").value
+        label.display = True
+        if (datum != "") and (nev != ""):
+            f = open("csv/hianyzasok.csv", "a", encoding="utf-8")
+            f.write(f"{nev};{idotartam};{datum};False\n")
             f.close()
             label.update("Sikeres feljegyzés!")
             label.classes = "success"
@@ -542,19 +785,34 @@ class KretaApp(App):
 
                 for a in self.query(".hazik"):
                     a.display = False
+                for a in self.query(".figyelm"):
+                    a.display = False
 
-                osszesdiakhazi = readHazik(d.osztaly)
+                osszes = readHazik(d.osztaly)
 
-                if osszesdiakhazi != None:
-                    for g, e in enumerate(osszesdiakhazi):
+                if osszes != None:
+                    self.query_one("#diakHazik").update("")
+                    for g, e in enumerate(osszes):
                         a = self.query(".hazik")[g]
                         a.title = f"{e.targy} - Határidő: {e.hatarido}"
                         a.display = True
-                        self.query(".hazikContent")[g].update(e.feladat)
+                        self.query(".hazikContent")[g].text = e.feladat
                 else:
                     self.query_one("#diakHazik").update(
                         "Nincsenek feljegyzett házi feladatok."
                     )
+
+                osszes = readFigyelmeztetesek(d.nev)
+
+                if osszes != None:
+                    self.query_one("#diakFigyelm").update("")
+                    for g, e in enumerate(osszes):
+                        a = self.query(".figyelm")[g]
+                        a.title = f"{e.tipus} {e.fokozat} - Dátum: {e.datum}"
+                        a.display = True
+                        self.query(".figyelmContent")[g].text = e.megjegyzes
+                else:
+                    self.query_one("#diakFigyelm").update("Nincsenek figyelmeztetések.")
 
         # tanár bejelentkezés
         for t in tanarok:
@@ -562,7 +820,7 @@ class KretaApp(App):
                 self.query_one("#loginScreen").display = False
                 self.query_one("#tanarScreen").display = True
 
-                text = "\nÚj házi feladat feljegyzése\n\n\nOsztály ("
+                text = "Új házi feladat feljegyzése\n\n\nOsztály ("
                 for i, a in enumerate(t.osztalyok):
                     if i != 0:
                         text += f", {a}"
@@ -637,7 +895,7 @@ class KretaApp(App):
             a.display = True
 
 
-# validate email, password
+# validate input
 def bad_e(value: str) -> bool:
     try:
         for d in diakok:
@@ -645,6 +903,15 @@ def bad_e(value: str) -> bool:
                 return True
         for t in tanarok:
             if t.email == value:
+                return True
+    except ValueError:
+        return False
+
+
+def bad_nev(value: str) -> bool:
+    try:
+        for d in diakok:
+            if d.nev == value:
                 return True
     except ValueError:
         return False
