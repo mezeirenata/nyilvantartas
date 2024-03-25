@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bootstrap Weboldal</title>
+  <title>Kreta2.0</title>
+  <link class="rounded-circle" rel="icon" href="kepek/kreta-logo.jpg" type="image/x-icon">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Saját CSS -->
@@ -15,6 +16,18 @@
       transform: translateX(-50%);
     }
 
+    body{
+      background-color: #101D29 !important;
+    }
+
+    h1{
+      color: white;
+    }
+
+    .pe-4{
+      color: white
+
+    }
   </style>
 </head>
 <body>
@@ -45,6 +58,116 @@
   </div>
 </nav>
 
+<!-- Bemutatkozás -->
+<div class="container my-5 text-center">
+  <h1 class="mb-4 pt-4">Készítők</h1>
+  <!-- Névlista -->
+  <div class="name-list">
+    <a href="#" class="pe-4" onclick="showInfo('noel')">Noel</a>
+    <a href="#" class="pe-4" onclick="showInfo('reni')">Reni</a>
+    <a href="#" class="pe-4" onclick="showInfo('marci')">Marci</a>
+  </div>
+
+  <!-- Információk -->
+  <div id="noelInfo" style="display: none;">
+    <!-- Noel információk -->
+    <div id="carouselExample" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="kepek/kep1.png" class="d-block w-100 p-5" alt="elsokep">
+        </div>
+        <div class="carousel-item">
+          <img src="kepek/kep2.png" class="d-block w-100 p-5" alt="masodikkep">
+        </div>
+        <div class="carousel-item">
+          <img src="kepek/kep3.jpg" class="d-block w-100 p-5" alt="harmadikkep">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    
+    <!-- Cards -->
+    <div class="container my-5">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+          <div class="card">
+            <img src="kepek/bejelentkezes.jpg" class="card-img-top" alt="bejelentkezes">
+            <div class="card-body">
+              <h5 class="card-title text-center">Bejelentkezés</h5>
+              <p class="card-text"><div class="text-center">Próbáltuk leegyszerüsítve megalkotni a KRETA</div><div class="text-center">rendszerét.</div></p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <img src="kepek/" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Kártya 2</h5>
+              <p class="card-text">Ez egy rövid leírás a második kártyáról.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Kártya 3</h5>
+              <p class="card-text">Ez egy rövid leírás a harmadik kártyáról.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  <div id="reniInfo" style="display: none;">
+    <!-- Reni információk -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col">
+        <div class="card">
+          <img src="kepek/reni.jpg" class="card-img-top" alt="Reni">
+          <div class="card-body">
+            <h5 class="card-title text-center">Reni tulajdonságok</h5>
+            <p class="card-text">Reni is egy nagyon jó tulajdonságú személy. </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="marciInfo" style="display: none;">
+    <!-- Marci információk -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col">
+        <div class="card">
+          <img src="kepek/marci.jpg" class="card-img-top" alt="Marci">
+          <div class="card-body">
+            <h5 class="card-title text-center">Marci tulajdonságok</h5>
+            <p class="card-text">Marci is egy nagyon jó tulajdonságú személy. </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function showInfo(name) {
+    var names = ['noel', 'reni', 'marci'];
+    names.forEach(function(n) {
+      document.getElementById(n + 'Info').style.display = 'none';
+    });
+    document.getElementById(name + 'Info').style.display = 'block';
+  }
+</script>
 </body>
 </html>
