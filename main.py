@@ -109,6 +109,9 @@ class KretaApp(App):
     .btn:hover {
         background: rgba(0,0,0,0.4);
     }
+    .hazikContent, .figyelmContent {
+        height: 15;
+    }
     #tanarHazikArea, #tanarFigyelmArea {
         width: 50%;
         height: 10;
@@ -133,7 +136,7 @@ class KretaApp(App):
         border: round blue;
         width: 63%;
     }
-    #diakHazik {
+    #diakHazik, #diakFigyelm {
         margin-left: 3;
     }
     .btns, #loginScreen {
@@ -156,7 +159,7 @@ class KretaApp(App):
         margin-top: 1;
         margin-left: 3;
     }
-    .hazik {
+    .hazik, .figyelm {
         margin-left: 4;
         margin-top: 1;
         width: 50%;
@@ -217,12 +220,75 @@ class KretaApp(App):
                 Button("Órarend", id="diakOrarendBtn", classes="btn"),
                 Button("Jegyek", id="diakJegyekBtn", classes="btn"),
                 Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
+                Button("Figyelmeztetések", id="diakFigyelmBtn", classes="btn"),
                 classes="btns screen",
             ),
             Vertical(
                 Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
                 DataTable(id="diakOrarend", zebra_stripes=True),
                 id="diakOrarendView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("\nFigyelmeztetések", id="diakFigyelmLabel", classes="label"),
+                Label("", id="diakFigyelm"),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                Collapsible(
+                    TextArea(
+                        "", classes="figyelmContent", read_only=True, soft_wrap=True
+                    ),
+                    collapsed=True,
+                    title="",
+                    classes="figyelm",
+                ),
+                id="diakFigyelmView",
                 classes="overflow",
             ),
             Vertical(
@@ -241,61 +307,81 @@ class KretaApp(App):
                 Label("\nHázi feladatok", id="diakHazikLabel", classes="label"),
                 Label("", id="diakHazik"),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
                 ),
                 Collapsible(
-                    Label("", classes="hazikContent"),
+                    TextArea(
+                        "", classes="hazikContent", read_only=True, soft_wrap=True
+                    ),
                     collapsed=True,
                     title="",
                     classes="hazik",
@@ -504,6 +590,7 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakFigyelmView").display = False
 
         self.query_one("#tanarHaziView").display = False
         self.query_one("#tanarHianyzasView").display = False
@@ -526,6 +613,7 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
         self.query_one("#tanarHaziView").display = False
@@ -534,18 +622,28 @@ class KretaApp(App):
     def diaOrarend(self, event: Button.Pressed) -> None:
         self.query_one("#diakOrarendView").display = True
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakJegyekView").display = False
 
     @on(Button.Pressed, "#diakJegyekBtn")
     def diakJegyek(self, event: Button.Pressed) -> None:
         self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = True
 
     @on(Button.Pressed, "#diakHaziBtn")
     def diakHazik(self, event: Button.Pressed) -> None:
+        self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakHaziView").display = True
+        self.query_one("#diakJegyekView").display = False
+
+    @on(Button.Pressed, "#diakFigyelmBtn")
+    def diakFigyelm(self, event: Button.Pressed) -> None:
+        self.query_one("#diakFigyelmView").display = True
+        self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = False
 
     @on(Button.Pressed, "#tanarJegyekBtn")
@@ -687,19 +785,34 @@ class KretaApp(App):
 
                 for a in self.query(".hazik"):
                     a.display = False
+                for a in self.query(".figyelm"):
+                    a.display = False
 
-                osszesdiakhazi = readHazik(d.osztaly)
+                osszes = readHazik(d.osztaly)
 
-                if osszesdiakhazi != None:
-                    for g, e in enumerate(osszesdiakhazi):
+                if osszes != None:
+                    self.query_one("#diakHazik").update("")
+                    for g, e in enumerate(osszes):
                         a = self.query(".hazik")[g]
                         a.title = f"{e.targy} - Határidő: {e.hatarido}"
                         a.display = True
-                        self.query(".hazikContent")[g].update(e.feladat)
+                        self.query(".hazikContent")[g].text = e.feladat
                 else:
                     self.query_one("#diakHazik").update(
                         "Nincsenek feljegyzett házi feladatok."
                     )
+
+                osszes = readFigyelmeztetesek(d.nev)
+
+                if osszes != None:
+                    self.query_one("#diakFigyelm").update("")
+                    for g, e in enumerate(osszes):
+                        a = self.query(".figyelm")[g]
+                        a.title = f"{e.tipus} {e.fokozat} - Dátum: {e.datum}"
+                        a.display = True
+                        self.query(".figyelmContent")[g].text = e.megjegyzes
+                else:
+                    self.query_one("#diakFigyelm").update("Nincsenek figyelmeztetések.")
 
         # tanár bejelentkezés
         for t in tanarok:
