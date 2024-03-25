@@ -8,7 +8,7 @@ class Hianyzas:
 
 def readHianyzasok(diaknev):
     hianyzasok = []
-    f = open("csv/hazik.csv", "r", encoding="utf-8")
+    f = open("csv/hianyzasok.csv", "r", encoding="utf-8")
     f.readline()
     for line in f:
         hianyzas = line.strip().split(";")
@@ -17,7 +17,7 @@ def readHianyzasok(diaknev):
 
     diakHianyzasok = []
     for h in hianyzasok:
-        if h.nev == diaknev:
+        if h.nev == diaknev and h.igazolt == "False":
             diakHianyzasok.append(h)
 
     if diakHianyzasok != []:

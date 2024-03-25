@@ -136,7 +136,7 @@ class KretaApp(App):
         border: round blue;
         width: 63%;
     }
-    #diakHazik, #diakFigyelm {
+    #diakHazik, #diakFigyelm, #diakHianyzasok {
         margin-left: 3;
     }
     .btns, #loginScreen {
@@ -159,7 +159,7 @@ class KretaApp(App):
         margin-top: 1;
         margin-left: 3;
     }
-    .hazik, .figyelm {
+    .hazik, .figyelm, .hianyzas {
         margin-left: 4;
         margin-top: 1;
         width: 50%;
@@ -221,12 +221,61 @@ class KretaApp(App):
                 Button("Jegyek", id="diakJegyekBtn", classes="btn"),
                 Button("Házi feladatok", id="diakHaziBtn", classes="btn"),
                 Button("Figyelmeztetések", id="diakFigyelmBtn", classes="btn"),
+                Button("Hiányzások", id="diakHianyzasBtn", classes="btn"),
                 classes="btns screen",
             ),
             Vertical(
                 Label("\nÓrarend", id="diakOrarendLabel", classes="label"),
                 DataTable(id="diakOrarend", zebra_stripes=True),
                 id="diakOrarendView",
+                classes="overflow",
+            ),
+            Vertical(
+                Label("\nHiányzások", id="diakHianyzasLabel", classes="label"),
+                Label(id="diakHianyzasok"),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                Collapsible(
+                    Label("", classes="hianyzasContent"),
+                    Button("Igazolás", classes="btn label diakIgazolasBtn"),
+                    collapsed=True,
+                    title="",
+                    classes="hianyzas",
+                ),
+                id="diakHianyzasView",
                 classes="overflow",
             ),
             Vertical(
@@ -590,6 +639,7 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakFigyelmView").display = False
 
         self.query_one("#tanarHaziView").display = False
@@ -613,6 +663,7 @@ class KretaApp(App):
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakJegyekView").display = False
         self.query_one("#diakHaziView").display = False
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakFigyelmView").display = False
         self.query_one("#tanarHianyzasView").display = False
         self.query_one("#tanarJegyekView").display = False
@@ -620,6 +671,7 @@ class KretaApp(App):
 
     @on(Button.Pressed, "#diakOrarendBtn")
     def diaOrarend(self, event: Button.Pressed) -> None:
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakOrarendView").display = True
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakFigyelmView").display = False
@@ -628,6 +680,7 @@ class KretaApp(App):
     @on(Button.Pressed, "#diakJegyekBtn")
     def diakJegyek(self, event: Button.Pressed) -> None:
         self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = True
@@ -636,11 +689,21 @@ class KretaApp(App):
     def diakHazik(self, event: Button.Pressed) -> None:
         self.query_one("#diakFigyelmView").display = False
         self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakHaziView").display = True
+        self.query_one("#diakJegyekView").display = False
+
+    @on(Button.Pressed, "#diakHianyzasBtn")
+    def diakHianyzas(self, event: Button.Pressed) -> None:
+        self.query_one("#diakFigyelmView").display = False
+        self.query_one("#diakHianyzasView").display = True
+        self.query_one("#diakOrarendView").display = False
+        self.query_one("#diakHaziView").display = False
         self.query_one("#diakJegyekView").display = False
 
     @on(Button.Pressed, "#diakFigyelmBtn")
     def diakFigyelm(self, event: Button.Pressed) -> None:
+        self.query_one("#diakHianyzasView").display = False
         self.query_one("#diakFigyelmView").display = True
         self.query_one("#diakOrarendView").display = False
         self.query_one("#diakHaziView").display = False
@@ -783,9 +846,47 @@ class KretaApp(App):
                 table.add_columns(*d.orarend[0])
                 table.add_rows(d.orarend[1:])
 
-                for a in self.query(".hazik"):
+                for a in self.query(".hianyzas"):
                     a.display = False
+
+                osszes = readHianyzasok(d.nev)
+
+                def igazolt(boolean):
+                    if boolean == "True":
+                        return "Igen"
+                    else:
+                        return "Nem"
+
+                if osszes != None:
+                    self.query_one("#diakHianyzasok").update("")
+                    for g, e in enumerate(osszes):
+                        a = self.query(".hianyzas")[g]
+                        a.title = f"{e.datum}"
+                        a.display = True
+                        self.query(".hianyzasContent")[g].update(
+                            f"{e.idotartam}\nIgazolt: {igazolt(e.igazolt)}"
+                        )
+                else:
+                    self.query_one("#diakHianyzasok").update(
+                        "Nincsenek feljegyzett hiányzások."
+                    )
+
                 for a in self.query(".figyelm"):
+                    a.display = False
+
+                osszes = readFigyelmeztetesek(d.nev)
+
+                if osszes != None:
+                    self.query_one("#diakFigyelm").update("")
+                    for g, e in enumerate(osszes):
+                        a = self.query(".figyelm")[g]
+                        a.title = f"{e.tipus} {e.fokozat} - Dátum: {e.datum}"
+                        a.display = True
+                        self.query(".figyelmContent")[g].text = e.megjegyzes
+                else:
+                    self.query_one("#diakFigyelm").update("Nincsenek figyelmeztetések.")
+
+                for a in self.query(".hazik"):
                     a.display = False
 
                 osszes = readHazik(d.osztaly)
@@ -801,18 +902,6 @@ class KretaApp(App):
                     self.query_one("#diakHazik").update(
                         "Nincsenek feljegyzett házi feladatok."
                     )
-
-                osszes = readFigyelmeztetesek(d.nev)
-
-                if osszes != None:
-                    self.query_one("#diakFigyelm").update("")
-                    for g, e in enumerate(osszes):
-                        a = self.query(".figyelm")[g]
-                        a.title = f"{e.tipus} {e.fokozat} - Dátum: {e.datum}"
-                        a.display = True
-                        self.query(".figyelmContent")[g].text = e.megjegyzes
-                else:
-                    self.query_one("#diakFigyelm").update("Nincsenek figyelmeztetések.")
 
         # tanár bejelentkezés
         for t in tanarok:
