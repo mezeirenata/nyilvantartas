@@ -1,0 +1,22 @@
+.cyan{
+    color:rgb(48,168,202);
+}
+.bg-cyan{
+    background-color: rgb(73, 100, 107);
+}
+.bg-dark2{
+    background-color: #101D29 ;
+}
+.navbar-brand:hover img {
+    box-shadow:0 0 5px 5px rgba(5, 5, 5, 0.278);
+}
+.navbar-nav .nav-link.text-info:hover{
+    text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.968), 0 0 1em rgba(254, 254, 254, 0.468);
+}
+.text-white:hover{
+    cursor:default;
+}
+.container-kep{
+    background-image: url(kepek/bejelentkezes2.png);
+    background-repeat:no-repeat;
+}
